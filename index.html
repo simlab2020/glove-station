@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Glove Sizing">
 <meta name="theme-color" content="#E7EBE5">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Glove%20Sizing%20Station%22%2C%22short_name%22%3A%22Glove%20Sizing%22%2C%22display%22%3A%22fullscreen%22%2C%22orientation%22%3A%22any%22%2C%22background_color%22%3A%22%23E7EBE5%22%2C%22theme_color%22%3A%22%23E7EBE5%22%2C%22start_url%22%3A%22.%22%7D">
 <title>Glove Sizing Station</title>
 <style>
   :root{
     --ground:#E7EBE5; --panel:#FBFCFA; --ink:#16262B; --muted:#5E7077;
-    --rule:#C3CCC5; --nitrile:#2742C8; --lavender:#7B5FC4; --alert:#9A3B2A; --ok:#2E7D5B;
+    --rule:#C3CCC5; --nitrile:#2742C8; --lavender:#7B5FC4; --alert:#9A3B2A;
     box-sizing:border-box;
     padding-top:env(safe-area-inset-top,0px);
     padding-bottom:env(safe-area-inset-bottom,0px);
@@ -21,118 +21,128 @@
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
       --ground:#11191C; --panel:#182225; --ink:#E6EDE8; --muted:#90A49C;
-      --rule:#2D3B3F; --nitrile:#8AA0FF; --lavender:#B49BF0; --alert:#E08A72; --ok:#6FC79E;
+      --rule:#2D3B3F; --nitrile:#8AA0FF; --lavender:#B49BF0; --alert:#E08A72;
       color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
     --ground:#11191C; --panel:#182225; --ink:#E6EDE8; --muted:#90A49C;
-    --rule:#2D3B3F; --nitrile:#8AA0FF; --lavender:#B49BF0; --alert:#E08A72; --ok:#6FC79E;
+    --rule:#2D3B3F; --nitrile:#8AA0FF; --lavender:#B49BF0; --alert:#E08A72;
     color-scheme:dark;
   }
   *,*::before,*::after{box-sizing:border-box}
-  html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+  html{height:100%;-webkit-text-size-adjust:100%}
   body{margin:0;min-height:100%;background:var(--ground);color:var(--ink);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    font-size:18px;line-height:1.5;-webkit-font-smoothing:antialiased;
-    overscroll-behavior:none}
-  .wrap{max-width:1500px;margin:0 auto;padding:14px 22px 36px}
-  header.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;
-    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:14px}
-  .mark{font-weight:600;font-size:18px;letter-spacing:-0.01em}
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:18px;
+    line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+  .wrap{max-width:1500px;margin:0 auto;padding:12px 18px 30px}
+  .a2hs{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--lavender);
+    border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:15.5px;display:flex;
+    gap:12px;align-items:flex-start;justify-content:space-between}
+  .a2hs button{flex:0 0 auto}
+  /* when the page is the whole screen there is no browser chrome to allow for */
+  :root:fullscreen .wrap{padding-top:18px}
+  header.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border-bottom:1px solid var(--rule);padding-bottom:9px;margin-bottom:12px}
+  .mark{font-weight:600;font-size:17px}
   .mark span{color:var(--muted);font-weight:400}
   .barlinks{display:flex;gap:5px;flex-wrap:wrap}
   button{font:inherit;color:inherit}
   .ghost{background:none;border:1px solid var(--rule);border-radius:999px;padding:8px 15px;
     cursor:pointer;color:var(--muted);font-size:14.5px}
-  .ghost:hover{border-color:var(--ink);color:var(--ink)}
   .solid{background:var(--nitrile);color:var(--panel);border:0;border-radius:10px;
     padding:15px 26px;font-size:18px;font-weight:600;cursor:pointer;min-height:56px}
-  .solid:disabled{opacity:.35;cursor:default}
+  .solid:disabled{opacity:.35}
   .line{background:none;border:1px solid var(--ink);border-radius:10px;padding:14px 24px;
     font-size:17px;font-weight:500;cursor:pointer;min-height:56px}
   :focus-visible{outline:3px solid var(--lavender);outline-offset:3px}
   h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;
-    font-size:clamp(30px,4vw,52px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 8px}
+    font-size:clamp(26px,3.6vw,46px);line-height:1.05;margin:0 0 6px}
   h2{font-size:19px;font-weight:600;margin:0 0 8px}
-  p{margin:0 0 13px;max-width:64ch}
+  p{margin:0 0 12px;max-width:64ch}
   .muted{color:var(--muted)} .small{font-size:15px}
   .view{display:none} .view.on{display:block}
   .row{display:flex;gap:11px;flex-wrap:wrap;align-items:center}
 
-  .pad{position:relative;background:var(--panel);border:2px dashed var(--rule);border-radius:16px;
-    height:clamp(280px,50vh,600px);margin:10px 0;touch-action:none;overflow:hidden;
-    user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center}
-  .pad.live{border-style:solid;border-color:var(--nitrile)}
-  .pad.done{border-style:solid;border-color:var(--ok)}
-  .padmsg{text-align:center;pointer-events:none;max-width:34ch;z-index:2;padding:0 16px}
-  .padmsg b{display:block;font-size:clamp(21px,3vw,32px);font-weight:600;margin-bottom:5px}
-  .padmsg em{font-style:normal;color:var(--muted);font-size:16.5px}
-  .dot{position:absolute;width:62px;height:62px;border-radius:50%;background:var(--nitrile);
-    opacity:.2;transform:translate(-50%,-50%);pointer-events:none}
-  .dot.core{width:13px;height:13px;opacity:.9}
-  .spanline{position:absolute;height:3px;background:var(--nitrile);opacity:.5;pointer-events:none}
-  .countdown{position:absolute;left:0;bottom:0;height:6px;background:var(--nitrile);width:0}
-  .live-mm{position:absolute;right:16px;top:12px;font-family:Georgia,serif;font-size:36px;
-    color:var(--muted);font-variant-numeric:tabular-nums;pointer-events:none}
+  /* ---------- gauge ---------- */
+  #v-gauge.on{display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
+  .gaugetop{flex:0 0 auto}
+  .gaugetop p{font-size:17px;margin-bottom:8px}
+  .gaugehost{flex:1 1 auto;min-height:260px;display:flex}
+  .gauge{position:relative;flex:1 1 auto;background:var(--panel);
+    border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+  .stop{position:absolute;top:0;bottom:0;width:6px;background:var(--lavender);z-index:4}
+  .stoplabel{position:absolute;top:10px;font-size:14px;font-weight:600;color:var(--lavender);
+    writing-mode:vertical-rl;z-index:4}
+  .bandzone{position:absolute;top:0;bottom:0;border-right:2px dashed var(--rule);cursor:pointer}
+  .bandzone .tint{position:absolute;inset:0;background:var(--nitrile)}
+  .bandzone .cap{position:absolute;left:0;right:0;top:0;text-align:center;padding-top:14px}
+  .bandzone .cap b{display:block;font-size:clamp(26px,4vw,46px);font-weight:700;line-height:1;
+    color:var(--nitrile)}
+  .bandzone .cap em{font-style:normal;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .bandzone .tap{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:13px;
+    color:var(--muted)}
+  .ghint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;
+    color:var(--muted);max-width:30ch;z-index:5}
 
-  /* full-height home so the hand comes in from the bottom edge */
-  #v-auto.on{display:flex;flex-direction:column;min-height:calc(100vh - 130px)}
-  .autotop{flex:0 0 auto}
-  .autotop h1{font-size:clamp(26px,3.4vw,40px);margin-bottom:4px}
-  .autotop p{margin-bottom:6px;font-size:17px}
-  .padhost{flex:1 1 auto;display:flex;flex-direction:column;min-height:260px}
-  .padhost .pad{flex:1 1 auto;height:auto;margin-bottom:0;border-bottom-left-radius:0;
-    border-bottom-right-radius:0;align-items:flex-end;justify-content:center}
-  .silhouette{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
-    pointer-events:none;opacity:.13;z-index:0}
-  .silhouette path{fill:var(--ink)}
-  .banner{position:absolute;left:0;right:0;top:0;padding:14px 16px;text-align:center;
-    pointer-events:none;z-index:3}
-  .banner b{display:block;font-size:clamp(19px,2.6vw,27px);font-weight:600}
-  .banner em{font-style:normal;color:var(--muted);font-size:16px}
-  .trouble{margin-top:10px}
+  /* ---------- hand scan ---------- */
+  #v-scan.on{display:flex;flex-direction:column;min-height:calc(100vh - 120px)}
+  .scantop{flex:0 0 auto}
+  .scanhost{flex:1 1 auto;min-height:280px;display:flex}
+  .scanpad{position:relative;flex:1 1 auto;background:var(--panel);border:2px dashed var(--rule);
+    border-radius:14px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+  .scanpad.live{border-style:solid;border-color:var(--nitrile)}
+  .blob{position:absolute;width:54px;height:54px;border-radius:50%;background:var(--nitrile);
+    opacity:.18;transform:translate(-50%,-50%);pointer-events:none}
+  .blob.c{width:11px;height:11px;opacity:.85}
+  .bbox{position:absolute;border:2px solid var(--lavender);pointer-events:none}
+  .bbox span{position:absolute;background:var(--panel);color:var(--lavender);font-size:13px;
+    font-weight:600;padding:1px 6px;border-radius:5px;font-variant-numeric:tabular-nums}
+  .bbox .bw{left:50%;top:-12px;transform:translateX(-50%)}
+  .bbox .bh{left:-10px;top:50%;transform:translate(-100%,-50%)}
+  .scanbanner{position:absolute;left:0;right:0;top:0;padding:12px;text-align:center;pointer-events:none;z-index:3}
+  .scanbanner b{display:block;font-size:clamp(18px,2.4vw,25px);font-weight:600}
+  .scanbanner em{font-style:normal;color:var(--muted);font-size:15.5px}
+  .counts{position:absolute;right:12px;bottom:10px;font-size:14px;color:var(--muted);
+    font-variant-numeric:tabular-nums;pointer-events:none;text-align:right;line-height:1.35}
+  .report{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:18px;margin:10px 0}
+  .report table{font-size:15px}
+  .verdictline{font-size:17px;margin:10px 0 0}
+  .stable{color:var(--nitrile);font-weight:600}
+  .cdbar{position:absolute;left:0;bottom:0;height:5px;background:var(--nitrile);width:0}
 
+  /* ---------- caliper ---------- */
+  .stage{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    overflow:hidden;margin:10px 0;touch-action:none;user-select:none;-webkit-user-select:none}
+  .ruler{position:relative;height:34px;border-bottom:1px solid var(--rule)}
+  .tick{position:absolute;top:0;width:1px;background:var(--rule)}
+  .tick.maj{background:var(--muted);height:13px} .tick.min{height:7px}
+  .tnum{position:absolute;top:15px;font-size:11.5px;color:var(--muted);transform:translateX(-50%);
+    font-variant-numeric:tabular-nums}
+  .field{position:relative;height:clamp(230px,40vh,340px)}
+  .jaw{position:absolute;top:0;bottom:0;width:3px;background:var(--nitrile);cursor:ew-resize;z-index:2}
+  .jaw .grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:96px;
+    border-radius:9px;background:var(--nitrile);display:flex;align-items:center;justify-content:center;gap:4px}
+  .grip i{display:block;width:2px;height:34px;background:var(--panel);opacity:.8;border-radius:2px}
+  .spanband{position:absolute;top:50%;height:2px;background:var(--nitrile);opacity:.35}
+  .readout{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:2px 0 12px}
+  .mm{font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,7vw,74px);line-height:.9;
+    font-variant-numeric:tabular-nums}
+  .unit{font-size:18px;color:var(--muted)}
+  .inches{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  /* ---------- result ---------- */
   .verdict{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;margin:12px 0}
-  .sizeletter{font-family:Georgia,"Times New Roman",serif;font-size:clamp(84px,16vw,190px);
-    line-height:.8;letter-spacing:-0.03em;margin:4px 0 10px;color:var(--nitrile)}
-  dl.facts{margin:16px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 20px;font-size:16.5px}
+  .sizeletter{font-family:Georgia,"Times New Roman",serif;font-size:clamp(84px,16vw,180px);
+    line-height:.8;margin:4px 0 10px;color:var(--nitrile)}
+  dl.facts{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 20px;font-size:16.5px}
   dl.facts dt{color:var(--muted)} dl.facts dd{margin:0;font-variant-numeric:tabular-nums}
   .pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:4px 13px;
     font-size:13.5px;color:var(--muted)}
-  .resetbar{height:4px;background:var(--rule);border-radius:2px;margin-top:18px;overflow:hidden}
+  .resetbar{height:4px;background:var(--rule);border-radius:2px;margin-top:16px;overflow:hidden}
   .resetbar i{display:block;height:100%;background:var(--muted);width:100%}
 
-  .gauge{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
-    height:clamp(300px,46vh,440px);margin:12px 0;overflow:hidden}
-  .gline{position:absolute;top:0;bottom:0;width:2px;background:var(--rule)}
-  .gline.mid{background:var(--lavender)}
-  .glabel{position:absolute;top:10px;transform:translateX(-50%);font-size:13px;color:var(--muted);
-    font-variant-numeric:tabular-nums}
-  .gband{position:absolute;bottom:14px;transform:translateX(-50%);text-align:center}
-  .gband b{display:block;font-size:26px;font-weight:700;color:var(--nitrile);line-height:1}
-  .gband em{font-style:normal;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .ghint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;
-    color:var(--muted);max-width:28ch;pointer-events:none}
-  .stage{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
-    overflow:hidden;margin:12px 0;touch-action:none;user-select:none;-webkit-user-select:none}
-  .ruler{position:relative;height:36px;border-bottom:1px solid var(--rule)}
-  .tick{position:absolute;top:0;width:1px;background:var(--rule)}
-  .tick.maj{background:var(--muted);height:14px} .tick.min{height:8px}
-  .tnum{position:absolute;top:16px;font-size:11.5px;color:var(--muted);transform:translateX(-50%);
-    font-variant-numeric:tabular-nums}
-  .field{position:relative;height:clamp(220px,34vh,300px)}
-  .jaw{position:absolute;top:0;bottom:0;width:3px;background:var(--nitrile);cursor:ew-resize}
-  .jaw .grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:86px;
-    border-radius:8px;background:var(--nitrile);display:flex;align-items:center;justify-content:center;gap:4px}
-  .grip i{display:block;width:2px;height:30px;background:var(--panel);opacity:.8;border-radius:2px}
-  .spanband{position:absolute;top:50%;height:2px;background:var(--nitrile);opacity:.35}
-  .readout{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;margin:2px 0 14px}
-  .mm{font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,7vw,78px);line-height:.9;
-    letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
-  .unit{font-size:18px;color:var(--muted)}
-  .inches{font-size:16.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-
+  /* ---------- panels ---------- */
   .cardbox{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px;margin:12px 0}
   .presets{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
   .preset{border:1px solid var(--rule);background:var(--ground);border-radius:10px;padding:13px 17px;
@@ -140,7 +150,7 @@
   .preset.on{border-color:var(--nitrile);box-shadow:inset 0 0 0 1px var(--nitrile)}
   .preset b{display:block;font-size:16.5px;font-weight:600}
   .preset em{font-style:normal;font-size:13.5px;color:var(--muted)}
-  .preset .det{position:absolute;top:-9px;right:10px;background:var(--ok);color:var(--panel);
+  .preset .det{position:absolute;top:-9px;right:10px;background:var(--nitrile);color:var(--panel);
     font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px}
   .checkbar{height:26px;background:var(--lavender);border-radius:5px;margin:12px 0 6px;position:relative}
   .checkbar::after{content:"100 mm — check with a ruler";position:absolute;left:8px;top:50%;
@@ -148,88 +158,67 @@
   table{border-collapse:collapse;width:100%;font-size:15.5px;font-variant-numeric:tabular-nums}
   th,td{text-align:left;padding:9px;border-bottom:1px solid var(--rule)}
   th{font-weight:600;color:var(--muted);font-size:13.5px}
-  input[type=text],input[type=number],td input{font:inherit;padding:10px;border:1px solid var(--rule);
-    border-radius:8px;background:var(--ground);color:var(--ink);width:7em}
-  textarea{width:100%;min-height:110px;font:14px ui-monospace,Menlo,Consolas,monospace;
-    border:1px solid var(--rule);border-radius:8px;background:var(--ground);color:var(--ink);padding:10px}
-  .notice{border-left:3px solid var(--alert);padding:2px 0 2px 14px;margin:13px 0;font-size:15.5px;max-width:64ch}
-  .notice.good{border-left-color:var(--ok)}
+  td input{font:inherit;padding:10px;border:1px solid var(--rule);border-radius:8px;
+    background:var(--ground);color:var(--ink);width:6.5em}
+  .notice{border-left:3px solid var(--alert);padding:2px 0 2px 14px;margin:12px 0;font-size:15.5px;max-width:64ch}
   .scroller{overflow-x:auto}
-  footer{margin-top:28px;padding-top:12px;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
+  footer{margin-top:24px;padding-top:10px;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+<div id="a2hs" class="a2hs" hidden></div>
+
 <header class="bar">
-  <div class="mark">Glove Sizing <span id="markSub">— simulation lab</span></div>
+  <div class="mark">Glove Sizing <span>— simulation lab</span></div>
   <div class="barlinks">
-    <button class="ghost" id="navGauge">Gauge</button>
+    <button class="ghost" id="fsBtn" hidden>Full screen</button>
+    <button class="ghost" id="navScan">Hand scan</button>
+    <button class="ghost" id="navMeasure">Measure exactly</button>
     <button class="ghost" id="navCal">Set up</button>
-    <button class="ghost" id="navTrain">Train</button>
     <button class="ghost" id="navChart">Chart</button>
   </div>
 </header>
 
-<!-- AUTO -->
-<section class="view" id="v-auto">
-  <div class="autotop">
-    <h1>Press your knuckles on the screen</h1>
-    <p class="muted">Make a loose fist and lay the four knuckles flat on the glass. Hold still for a second.</p>
+<!-- GAUGE (home) -->
+<section class="view" id="v-gauge">
+  <div class="gaugetop">
+    <h1>Find your glove size</h1>
+    <p class="muted">Lay your hand flat on the screen, fingers together, thumb tucked. Put the <strong>little-finger edge</strong> against the purple bar, level with your knuckles. Whichever band your index knuckle lands in is your size — tap it.</p>
   </div>
-  <div class="padhost">
-    <div class="pad" id="pad">
-      <svg class="silhouette" id="silhouette" viewBox="0 0 220 240" width="220" height="240" aria-hidden="true">
-        <path d="M26 240 V86 q0-22 22-26 14-3 20 10 6-16 22-16 16 0 22 16 6-13 20-10 22 4 22 26 V240 z"/>
-        <circle cx="48" cy="92" r="13" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
-        <circle cx="84" cy="80" r="14" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
-        <circle cx="120" cy="82" r="14" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
-        <circle cx="154" cy="94" r="13" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
-      </svg>
-      <span class="banner" id="padMsg"><b>Four fingers here</b><em>side by side, flat on the glass</em></span>
-      <span class="countdown" id="cdown"></span>
+  <div class="gaugehost">
+    <div class="gauge" id="gauge"><div class="ghint" id="gaugeHint"></div></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="ghost" id="toScan">Try the hand scan instead</button>
+  </div>
+</section>
+
+<!-- HAND SCAN -->
+<section class="view" id="v-scan">
+  <div class="scantop">
+    <h1>Hand scan</h1>
+    <p class="muted">Lay your <strong>whole hand</strong> flat — fingers together, thumb tucked in, and press the heel of your palm down too. Hold still. Do it three times so the station can see whether it gets the same answer twice.</p>
+  </div>
+  <div class="scanhost">
+    <div class="scanpad" id="scanPad">
+      <span class="scanbanner" id="scanMsg"><b>Whole hand, flat</b><em>press the palm down as well as the fingers</em></span>
+      <span class="counts" id="scanCounts"></span>
+      <span class="cdbar" id="scanCd"></span>
     </div>
   </div>
-  <div class="row trouble">
-    <button class="ghost" id="toGauge">Use the life-size gauge</button>
-    <button class="ghost" id="toCaliper">Measure with bars</button>
+  <div id="scanReport"></div>
+  <div class="row" style="margin-top:10px">
+    <button class="ghost" id="scanRestart">Start over</button>
+    <button class="ghost" id="scanBack">Back to the gauge</button>
   </div>
-  <div id="autoWarn"></div>
-</section>
-
-<!-- RESULT -->
-<section class="view" id="v-result">
-  <div class="verdict">
-    <span class="pill" id="resMethod"></span>
-    <div class="sizeletter" id="resSize">M</div>
-    <p id="resLine" style="font-size:20px;margin:0"></p>
-    <dl class="facts">
-      <dt>Palm width</dt><dd id="resMm"></dd>
-      <dt>Palm circumference</dt><dd id="resCirc"></dd>
-      <dt>Surgical size</dt><dd id="resSurg"></dd>
-      <dt>Based on</dt><dd id="resConf"></dd>
-    </dl>
-    <div class="resetbar"><i id="resetFill"></i></div>
-  </div>
-  <div class="row">
-    <button class="solid" id="againBtn">Measure again</button>
-    <button class="line" id="resChart">See the chart</button>
-  </div>
-  <p class="small muted">If this feels tight across the knuckles or loose at the fingertips, try the next size. Brands run differently.</p>
-</section>
-
-<!-- GAUGE -->
-<section class="view" id="v-gauge">
-  <h1>Life-size gauge</h1>
-  <p>Hold your hand flat against the screen, fingers together, thumb tucked, palm centred on the purple line. Read which pair of marks your knuckles land between.</p>
-  <div class="gauge" id="gauge"><div class="ghint" id="gaugeHint"></div></div>
-  <button class="line" id="gaugeBack">Back</button>
 </section>
 
 <!-- CALIPER -->
 <section class="view" id="v-measure">
-  <h1>Measure with the bars</h1>
-  <p>Slide the bars until they touch each side of your hand at the knuckles. Drag with your other hand.</p>
+  <h1>Measure exactly</h1>
+  <p class="muted">Lay your hand flat and slide the bars in until they touch each side at the knuckles. Drag with your other hand.</p>
   <div class="stage" id="stage">
     <div class="ruler" id="ruler" aria-hidden="true"></div>
     <div class="field" id="field">
@@ -242,9 +231,29 @@
     <span class="inches" id="inOut"></span></div>
   <div class="row">
     <button class="solid" id="lockBtn">Show my size</button>
-    <button class="line" id="calBack">Back</button>
+    <button class="line" id="measBack">Back to the gauge</button>
   </div>
   <div id="measWarn"></div>
+</section>
+
+<!-- RESULT -->
+<section class="view" id="v-result">
+  <div class="verdict">
+    <span class="pill" id="resMethod"></span>
+    <div class="sizeletter" id="resSize">M</div>
+    <p id="resLine" style="font-size:20px;margin:0"></p>
+    <dl class="facts">
+      <dt>Palm width</dt><dd id="resMm"></dd>
+      <dt>Palm circumference</dt><dd id="resCirc"></dd>
+      <dt>Surgical size</dt><dd id="resSurg"></dd>
+    </dl>
+    <div class="resetbar"><i id="resetFill"></i></div>
+  </div>
+  <div class="row">
+    <button class="solid" id="againBtn">Measure again</button>
+    <button class="line" id="resChart">See the chart</button>
+  </div>
+  <p class="small muted">If this feels tight across the knuckles or loose at the fingertips, try the next size. Brands run differently.</p>
 </section>
 
 <!-- SET UP -->
@@ -273,38 +282,6 @@
   </details>
 </section>
 
-<!-- TRAIN -->
-<section class="view" id="v-train">
-  <h1>Train the automatic reading</h1>
-  <p>Out of the box the station works palm width out geometrically from finger spacing. Measure a handful of real hands here and it fits itself to your students instead.</p>
-  <div class="cardbox">
-    <h2>1 · Capture a knuckle reading</h2>
-    <div class="pad" id="trainPad" style="height:240px">
-      <span class="padmsg" id="trainMsg"><b>Four knuckles here</b><em>the way students will do it</em></span>
-    </div>
-    <h2>2 · Tape-measure the same hand</h2>
-    <p class="small muted">Across the knuckles, thumb excluded, hand flat.</p>
-    <div class="row">
-      <label class="small muted">Captured span <input type="text" id="trainSpan" readonly></label>
-      <label class="small muted">True palm width (mm) <input type="number" id="trainTrue" inputmode="decimal"></label>
-      <button class="solid" id="trainAdd" disabled>Add sample</button>
-    </div>
-    <div id="trainStatus"></div>
-  </div>
-  <div class="cardbox">
-    <h2>Samples</h2>
-    <div class="scroller"><table id="trainTable">
-      <thead><tr><th>#</th><th>Span</th><th>True</th><th>Predicted</th><th>Error</th><th></th></tr></thead>
-      <tbody></tbody></table></div>
-    <div class="row" style="margin-top:12px">
-      <button class="line" id="trainExport">Show data to copy</button>
-      <button class="ghost" id="trainClear">Clear samples</button>
-      <button class="ghost" id="trainBack">Back</button>
-    </div>
-    <textarea id="trainOut" style="display:none" readonly></textarea>
-  </div>
-</section>
-
 <!-- CHART -->
 <section class="view" id="v-chart">
   <h1>Size chart</h1>
@@ -317,324 +294,235 @@
     <button class="line" id="chartReset">Reset to defaults</button>
     <button class="ghost" id="chartBack">Back</button>
   </div>
+  <p class="small muted" style="margin-top:16px">Check these against a box from the stockroom before trusting them — manufacturers cut to different widths.</p>
 </section>
 
-<footer>Set-up, training samples and chart edits are stored on this device only.</footer>
+<footer>Set-up and chart edits are stored on this device only.</footer>
 </div>
 
 <script>
 (function(){
   "use strict";
-  var CARD_MM = 85.6;
-  // kind "fixed": pixels per mm is a property of the panel (known pixel density).
-  // kind "screen": derived from the screen's CSS width over the panel's real width (needs full screen).
-  var PRESETS = [
-    {id:"ipad",   name:"iPad (9.7\" – 12.9\")", note:"264 ppi — exact, any orientation", kind:"fixed",  ppmm:5.197},
-    {id:"ipadmini",name:"iPad mini",            note:"326 ppi — exact",                  kind:"fixed",  ppmm:6.417},
-    {id:"lg86",   name:"LG 86\" CreateBoard",   note:"1895 mm active width",             kind:"screen", mm:1895.0},
-    {id:"lg65",   name:"LG 65\" TV",            note:"1428 mm active width",             kind:"screen", mm:1428.5},
-    {id:"dell24", name:"Dell Pro 24\" monitor", note:"527 mm active width",              kind:"screen", mm:527.0}
+  var CARD_MM=85.6;
+  var PRESETS=[
+    {id:"ipad",    name:"iPad (9.7\" – 12.9\")", note:"264 ppi — exact, any orientation", kind:"fixed",  ppmm:5.197},
+    {id:"ipadmini",name:"iPad mini",             note:"326 ppi — exact",                  kind:"fixed",  ppmm:6.417},
+    {id:"lg86",    name:"LG 86\" CreateBoard",   note:"1895 mm active width",             kind:"screen", mm:1895.0},
+    {id:"lg65",    name:"LG 65\" TV",            note:"1428 mm active width",             kind:"screen", mm:1428.5},
+    {id:"dell24",  name:"Dell Pro 24\" monitor", note:"527 mm active width",              kind:"screen", mm:527.0}
   ];
-  var DEFAULTS = [
-    {size:"XS",lo:0,hi:76},{size:"S",lo:76,hi:86},{size:"M",lo:86,hi:97},
-    {size:"L",lo:97,hi:108},{size:"XL",lo:108,hi:999}
-  ];
-  var ADVICE = {XS:"Reach for the extra-small box.",S:"Reach for the small box.",
-                M:"Reach for the medium box.",L:"Reach for the large box.",XL:"Reach for the extra-large box."};
+  var DEFAULTS=[{size:"XS",lo:0,hi:76},{size:"S",lo:76,hi:86},{size:"M",lo:86,hi:97},
+                {size:"L",lo:97,hi:108},{size:"XL",lo:108,hi:999}];
+  var ADVICE={XS:"Reach for the extra-small box.",S:"Reach for the small box.",
+              M:"Reach for the medium box.",L:"Reach for the large box.",XL:"Reach for the extra-large box."};
 
-  var store = {
+  var store={
     get:function(k,f){try{var v=localStorage.getItem(k);return v===null?f:JSON.parse(v);}catch(e){return f;}},
     set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
   };
-  var $ = function(id){return document.getElementById(id);};
+  var $=function(id){return document.getElementById(id);};
 
-  var pxPerMm = store.get("glove.pxPerMm", null);
-  var trim    = store.get("glove.trim", 1);
-  var chosen  = store.get("glove.preset", null);
-  var chart   = store.get("glove.chart", null) || DEFAULTS.map(function(r){return {size:r.size,lo:r.lo,hi:r.hi};});
-  var samples = store.get("glove.samples", []);
-  function ppm(){ return pxPerMm ? pxPerMm*trim : null; }
+  var pxPerMm=store.get("glove.pxPerMm",null);
+  var trim=store.get("glove.trim",1);
+  var chosen=store.get("glove.preset",null);
+  var chart=store.get("glove.chart",null)||DEFAULTS.map(function(r){return {size:r.size,lo:r.lo,hi:r.hi};});
+  function ppm(){ return pxPerMm?pxPerMm*trim:null; }
 
-  /* ---- device detection ---- */
   function detectPreset(){
-    var ua = navigator.userAgent || "";
-    var isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-    if(isIpad){
-      var mn = Math.min(screen.width, screen.height);
-      return mn <= 768 ? "ipadmini" : "ipad";
-    }
+    var ua=navigator.userAgent||"";
+    if(/iPad/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))
+      return Math.min(screen.width,screen.height)<=768?"ipadmini":"ipad";
     return null;
   }
-  var detected = detectPreset();
+  var detected=detectPreset();
 
-  var views = {auto:$("v-auto"),result:$("v-result"),gauge:$("v-gauge"),measure:$("v-measure"),
-               cal:$("v-cal"),train:$("v-train"),chart:$("v-chart")};
-  var current = "auto", resetTimer = null;
+  var views={gauge:$("v-gauge"),scan:$("v-scan"),measure:$("v-measure"),result:$("v-result"),cal:$("v-cal"),chart:$("v-chart")};
+  var current="gauge", resetTimer=null;
   function show(n){
-    current = n;
-    if(resetTimer){ clearInterval(resetTimer); resetTimer = null; }
-    for(var k in views){ views[k].classList.toggle("on", k===n); }
+    current=n;
+    if(resetTimer){ clearInterval(resetTimer); resetTimer=null; }
+    for(var k in views) views[k].classList.toggle("on",k===n);
     window.scrollTo(0,0);
-    if(n==="auto"){ resetPad(); checkAuto(); }
     if(n==="gauge") drawGauge();
+    if(n==="scan"){ scanRuns=[]; $("scanReport").innerHTML=""; scanReset(); }
     if(n==="measure"){ drawRuler(); placeJaws(); checkScreen(); }
     if(n==="cal"){ drawPresets(); paintCheck(); }
-    if(n==="train"){ drawTrain(); resetTrainPad(); }
     if(n==="chart") drawChart();
   }
 
-  /* ---- zoom guard: pinch-zoom silently breaks every measurement ---- */
   function zoomOk(){
     if(!window.visualViewport) return true;
-    return Math.abs(window.visualViewport.scale - 1) < 0.02;
+    return Math.abs(window.visualViewport.scale-1)<0.02;
   }
   function zoomNote(){
-    return zoomOk() ? "" :
-      '<p class="notice">The screen is zoomed in, so every measurement here is wrong. Pinch back out to normal size.</p>';
-  }
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", function(){
-      if(current==="auto") checkAuto();
-      if(current==="measure") checkScreen();
-    });
+    return zoomOk()?"":'<p class="notice">The screen is zoomed in, so every measurement here is wrong. Pinch back out to normal size.</p>';
   }
 
-  /* ---- fit: finger span -> palm width ---- */
-  function geoEstimate(span){ return span*4/3; } // 3 knuckle gaps + 1 knuckle width
-  function fit(){
-    if(samples.length < 3) return null;
-    var n=samples.length,sx=0,sy=0,sxx=0,sxy=0;
-    samples.forEach(function(s){ sx+=s.span; sy+=s.palm; sxx+=s.span*s.span; sxy+=s.span*s.palm; });
-    var d=n*sxx-sx*sx; if(Math.abs(d)<1e-6) return null;
-    var a=(n*sxy-sx*sy)/d, b=(sy-a*sx)/n, err=0;
-    samples.forEach(function(s){ err += Math.abs(a*s.span+b-s.palm); });
-    return {a:a,b:b,n:n,mae:err/n};
-  }
-  function estimate(span){
-    var f=fit();
-    if(f) return {mm:f.a*span+f.b, how:f.n+" measured hands, typically within "+f.mae.toFixed(0)+" mm"};
-    return {mm:geoEstimate(span), how:"finger spacing — not trained on real hands yet"};
-  }
-
-  /* ---- touch reading ---- */
-  // Measures the path length across four fingertips in two dimensions, so a hand
-  // laid on at an angle reads the same as one laid straight. Rejects contact
-  // patterns that can't be four fingers side by side.
-  // Knuckle pitch sits near 22 mm, so the index-to-little span runs roughly 45–85 mm.
-  var GAP_MIN=13, GAP_MAX=32, SPAN_MIN=42, SPAN_MAX=95;
-  function analyze(touches, rect, scale){
-    var pts=[],i;
-    for(i=0;i<touches.length;i++) pts.push({x:touches[i].clientX-rect.left, y:touches[i].clientY-rect.top});
-    if(pts.length<4) return {ok:false, why:"count", n:pts.length};
-    pts.sort(function(a,b){return a.x-b.x;});
-    function dist(a,b){ return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y))/scale; }
-    function windowAt(k){
-      var g=[dist(pts[k],pts[k+1]), dist(pts[k+1],pts[k+2]), dist(pts[k+2],pts[k+3])];
-      var span=g[0]+g[1]+g[2], mean=span/3;
-      var spread=(Math.abs(g[0]-mean)+Math.abs(g[1]-mean)+Math.abs(g[2]-mean))/(mean||1);
-      return {gaps:g, span:span, spread:spread};
-    }
-    var best=null;
-    for(i=0;i+3<pts.length;i++){
-      var w=windowAt(i);
-      if(best===null || w.spread<best.spread) best=w;
-    }
-    var tooTight=false, tooWide=false;
-    best.gaps.forEach(function(g){ if(g<GAP_MIN) tooTight=true; if(g>GAP_MAX) tooWide=true; });
-    if(tooTight) return {ok:false, why:"tight", span:best.span};
-    if(tooWide || best.span>SPAN_MAX) return {ok:false, why:"wide", span:best.span};
-    if(best.span<SPAN_MIN) return {ok:false, why:"small", span:best.span};
-    return {ok:true, span:best.span};
-  }
-  function makeReader(padEl,msgEl,opts){
-    var lastSpan=0,stableSince=0,locked=false,cd=opts.countdown?$(opts.countdown):null;
-    var liveCount=0,pendingRearm=false,nextIdle=null;
-    function clearDots(){
-      Array.prototype.slice.call(padEl.querySelectorAll(".dot,.spanline,.live-mm")).forEach(function(d){d.remove();});
-    }
-    function paint(touches,rect,span){
-      clearDots();
-      var i,minX=Infinity,maxX=-Infinity,yAvg=0;
-      for(i=0;i<touches.length;i++){
-        var x=touches[i].clientX-rect.left, y=touches[i].clientY-rect.top;
-        minX=Math.min(minX,x); maxX=Math.max(maxX,x); yAvg+=y;
-        var d=document.createElement("span"); d.className="dot";
-        d.style.left=x+"px"; d.style.top=y+"px"; padEl.appendChild(d);
-        var c=document.createElement("span"); c.className="dot core";
-        c.style.left=x+"px"; c.style.top=y+"px"; padEl.appendChild(c);
-      }
-      yAvg/=touches.length;
-      if(span!==null){
-        var l=document.createElement("span"); l.className="spanline";
-        l.style.left=minX+"px"; l.style.width=(maxX-minX)+"px";
-        l.style.top=Math.min(rect.height-20,yAvg+52)+"px"; padEl.appendChild(l);
-        var r=document.createElement("span"); r.className="live-mm";
-        r.textContent=span.toFixed(0)+" mm"; padEl.appendChild(r);
-      }
-    }
-    function reset(){
-      locked=false; stableSince=0; lastSpan=0; pendingRearm=false; clearDots();
-      padEl.classList.remove("live","done");
-      if(cd) cd.style.width="0";
-      msgEl.innerHTML = ppm() ? (nextIdle||opts.idle) : "<b>Not set up</b><em>tap Set up at the top</em>";
-      nextIdle=null;
-    }
-    // ask for another placement; waits for the hand to come off first
-    function rearm(msg){
-      nextIdle=msg||null;
-      if(liveCount===0) reset(); else pendingRearm=true;
-    }
-    function handle(e){
-      var scale=ppm(); if(!scale||!zoomOk()) return;
-      liveCount=e.touches.length;
-      if(locked){
-        if(pendingRearm && liveCount===0){ pendingRearm=false; reset(); }
-        return;
-      }
-      e.preventDefault();
-      var rect=padEl.getBoundingClientRect(), n=e.touches.length;
-      if(n===0){ reset(); return; }
-      var res=analyze(e.touches,rect,scale);
-      paint(e.touches,rect,res.ok?res.span:null);
-      padEl.classList.add("live");
-      if(!res.ok){
-        var msg;
-        if(res.why==="count") msg="<b>"+n+" of 4 knuckles</b><em>flatten the fist so all four press down together</em>";
-        else if(res.why==="tight") msg="<b>Can't separate the knuckles</b><em>press a little flatter and firmer</em>";
-        else if(res.why==="wide") msg="<b>That isn't a knuckle row</b><em>make a loose fist and lay the knuckles down</em>";
-        else msg="<b>Not quite reading</b><em>roll the fist forward so the knuckles sit flat</em>";
-        msgEl.innerHTML=msg;
-        stableSince=0; if(cd) cd.style.width="0"; return;
-      }
-      var span=res.span;
-      var now=Date.now();
-      if(Math.abs(span-lastSpan)>1.5) stableSince=now;
-      lastSpan=span; if(!stableSince) stableSince=now;
-      var held=now-stableSince, need=900;
-      if(cd) cd.style.width=Math.min(100,held/need*100)+"%";
-      msgEl.innerHTML="<b>Hold still</b><em>reading your hand</em>";
-      if(held>need){
-        locked=true; padEl.classList.remove("live"); padEl.classList.add("done");
-        if(cd) cd.style.width="100%";
-        opts.onLock(span);
-      }
-    }
-    padEl.addEventListener("touchstart",handle,{passive:false});
-    padEl.addEventListener("touchmove",handle,{passive:false});
-    padEl.addEventListener("touchend",handle,{passive:false});
-    padEl.addEventListener("touchcancel",function(){ reset(); });
-    return {reset:reset, rearm:rearm};
-  }
-
-  // One placement is never trusted on its own: the station takes two, and a third
-  // if they disagree, then reports the middle value — or admits it can't settle.
-  var readings=[];
-  var autoReader = makeReader($("pad"),$("padMsg"),{
-    idle:"<b>Four knuckles here</b><em>loose fist, flat on the glass</em>",
-    countdown:"cdown",
-    onLock:function(span){ setTimeout(function(){ gotReading(span); },280); }
-  });
-  function gotReading(span){
-    readings.push(span);
-    var lo=Math.min.apply(null,readings), hi=Math.max.apply(null,readings), spread=hi-lo;
-    var needAnother = readings.length<2 || (spread>5 && readings.length<3);
-    if(needAnother){
-      autoReader.rearm("<b>Reading "+readings.length+" saved</b><em>lift your hand and press again</em>");
-      return;
-    }
-    var sorted=readings.slice().sort(function(a,b){return a-b;});
-    var mid = sorted.length===2 ? (sorted[0]+sorted[1])/2 : sorted[1];
-    var finalSpread = sorted[sorted.length-1]-sorted[0];
-    var count = readings.length;
-    readings=[];
-    if(finalSpread>8){
-      autoReader.rearm("<b>Readings don't agree</b><em>they varied by "+finalSpread.toFixed(0)+" mm</em>");
-      $("autoWarn").innerHTML='<p class="notice">Three tries came out '+finalSpread.toFixed(0)+
-        ' mm apart, which is more than a whole glove size. Something about the placement isn\'t repeatable — use the life-size gauge, which measures your hand directly.</p>';
-      return;
-    }
-    var est=estimate(mid);
-    showResult(est.mm, count+" readings, agreed within "+finalSpread.toFixed(0)+" mm", est.how);
-  }
-  // The silhouette is a loose placement guide drawn larger than most hands, so
-  // nobody tries to match their fingers to it.
-  function sizeSilhouette(){
-    var svg=$("silhouette"), scale=ppm(); if(!svg) return;
-    var pad=$("pad");
-    var wMm=118, w=scale?wMm*scale:220;
-    var h=w*300/220, maxH=pad.clientHeight-10;
-    if(h>maxH && maxH>60){ h=maxH; w=h*220/300; }
-    svg.setAttribute("width",w); svg.setAttribute("height",h);
-  }
-  function resetPad(){ readings=[]; autoReader.reset(); setTimeout(sizeSilhouette,30); }
-  function checkAuto(){
-    var box=$("autoWarn");
-    if(!ppm()){ box.innerHTML='<p class="notice">This screen hasn\'t been set up yet. Tap Set up at the top.</p>'; return; }
-    var hasTouch=("ontouchstart" in window)||(navigator.maxTouchPoints>1);
-    box.innerHTML = zoomNote() + (hasTouch ? "" :
-      '<p class="notice">This device isn\'t reporting multi-touch, so the automatic reading won\'t work. Use the gauge or the bars.</p>');
-  }
-
-  /* ---- result ---- */
-  function sizeFor(mm){
-    for(var i=0;i<chart.length;i++){ if(mm>=chart[i].lo&&mm<chart[i].hi) return chart[i].size; }
-    return chart[chart.length-1].size;
-  }
-  function showResult(mm,method,basis){
-    var s=sizeFor(mm), circ=mm*2.2;
-    $("resSize").textContent=s;
-    $("resLine").textContent=ADVICE[s]||("Reach for the "+s+" box.");
-    $("resMm").textContent=mm.toFixed(0)+" mm  ("+(mm/25.4).toFixed(2)+" in)";
-    $("resCirc").textContent="about "+(circ/25.4).toFixed(1)+" in";
-    $("resSurg").textContent=(Math.round(circ/25.4*2)/2).toFixed(1);
-    $("resMethod").textContent=method;
-    $("resConf").textContent=basis||"direct measurement";
-    show("result");
-    // idle reset so the next person starts clean
-    var left=18000, fill=$("resetFill");
-    fill.style.width="100%";
-    resetTimer=setInterval(function(){
-      left-=200; fill.style.width=Math.max(0,left/18000*100)+"%";
-      if(left<=0){ clearInterval(resetTimer); resetTimer=null; show("auto"); }
-    },200);
-    views.result.addEventListener("touchstart",function stopOnce(){
-      if(resetTimer){ clearInterval(resetTimer); resetTimer=null; fill.style.width="0"; }
-      views.result.removeEventListener("touchstart",stopOnce);
-    },{passive:true});
-  }
-  $("againBtn").addEventListener("click",function(){ show("auto"); });
-  $("resChart").addEventListener("click",function(){ show("chart"); });
-
-  /* ---- gauge ---- */
+  /* ---------- gauge: edge-aligned, so there is only one thing to line up ---------- */
   function drawGauge(){
-    var g=$("gauge"),scale=ppm();
+    var g=$("gauge"), scale=ppm();
     g.innerHTML='<div class="ghint" id="gaugeHint"></div>';
-    if(!scale){ $("gaugeHint").textContent="Not set up yet — tap Set up."; return; }
-    var w=g.clientWidth, mid=w/2, widest=chart[chart.length-1].lo+16;
-    if(widest*scale>w-30){
-      $("gaugeHint").textContent="This screen is about "+Math.round(w/scale)+" mm wide — too narrow for a life-size gauge. Turn the iPad sideways, or use the automatic reading.";
+    if(!scale){ $("gaugeHint").textContent="Not set up yet — tap Set up at the top."; return; }
+    var w=g.clientWidth, stopX=Math.max(14,w*0.06);
+    var widest=chart[chart.length-1].lo+18;
+    if(stopX+widest*scale>w){
+      $("gaugeHint").innerHTML="This screen is about "+Math.round(w/scale)+
+        " mm wide — not enough room for a life-size gauge. Turn the screen sideways, or use <em>Measure exactly</em>.";
       return;
     }
     $("gaugeHint").textContent="";
-    var html='<div class="gline mid" style="left:'+(mid-1)+'px"></div>',edges=[];
-    chart.forEach(function(r){ if(r.hi<900) edges.push(r.hi); });
-    edges.forEach(function(mm){
-      var h=mm/2*scale;
-      html+='<div class="gline" style="left:'+(mid-h)+'px"></div><div class="gline" style="left:'+(mid+h)+'px"></div>';
-      html+='<div class="glabel" style="left:'+(mid+h)+'px">'+mm+'</div>';
-    });
+    var html='<div class="stop" style="left:'+stopX+'px"></div>'+
+             '<div class="stoplabel" style="left:'+(stopX+12)+'px">little-finger edge here</div>';
     var prev=0;
-    chart.forEach(function(r){
-      var hi=r.hi<900?r.hi:(edges[edges.length-1]+18);
-      html+='<div class="gband" style="left:'+(mid+(prev+hi)/4*scale)+'px"><b>'+r.size+'</b><em>'+
-            (r.lo>0?r.lo:"<")+(r.hi<900?"–"+r.hi:"+")+'</em></div>';
+    chart.forEach(function(r,i){
+      var hi = r.hi<900 ? r.hi : (chart[chart.length-1].lo+18);
+      var x0=stopX+prev*scale, x1=stopX+hi*scale;
+      var alpha=0.06+i*0.05;
+      html+='<div class="bandzone" data-i="'+i+'" style="left:'+x0+'px;width:'+(x1-x0)+'px">'+
+              '<div class="tint" style="opacity:'+alpha+'"></div>'+
+              '<div class="cap"><b>'+r.size+'</b><em>'+(r.lo>0?r.lo:"under "+r.hi)+
+              (r.hi<900?(r.lo>0?"–"+r.hi+" mm":" mm"):" mm and over")+'</em></div>'+
+              '<div class="tap">tap if you land here</div>'+
+            '</div>';
       prev=hi;
     });
     g.innerHTML+=html;
+    Array.prototype.slice.call(g.querySelectorAll(".bandzone")).forEach(function(z){
+      z.addEventListener("click",function(){
+        var r=chart[Number(z.dataset.i)];
+        var mid = r.hi<900 ? (r.lo+r.hi)/2 : r.lo+8;
+        showResult(mid, "Read off the gauge", r);
+      });
+    });
   }
 
-  /* ---- caliper ---- */
-  var field=$("field"),jawL=$("jawL"),jawR=$("jawR"),band=$("band"),posL=0.4,posR=0.6;
+  /* ---------- hand scan ----------
+     Reads every contact the screen reports from a flat hand and tracks two
+     candidate measurements: the width of the contact cloud and its length
+     (middle fingertip down to the palm heel). Length is rigid anatomy and
+     shouldn't care how the fingers are held; width does. Three placements
+     show which one this hardware actually delivers. */
+  var LENGTH_CHART=[{size:"XS",lo:0,hi:158},{size:"S",lo:158,hi:170},{size:"M",lo:170,hi:183},
+                    {size:"L",lo:183,hi:196},{size:"XL",lo:196,hi:999}];
+  var EDGE_INSET=12;           // contacts sit inside the true hand edge, both sides
+  var scanPad=$("scanPad"), scanRuns=[], scanLocked=false, scanWaitLift=false;
+  var scanLast=null, scanStable=0;
+
+  function clearScan(){
+    Array.prototype.slice.call(scanPad.querySelectorAll(".blob,.bbox")).forEach(function(n){n.remove();});
+  }
+  function scanReset(msg){
+    scanLocked=false; scanWaitLift=false; scanLast=null; scanStable=0;
+    clearScan(); scanPad.classList.remove("live");
+    $("scanCd").style.width="0"; $("scanCounts").textContent="";
+    $("scanMsg").innerHTML = ppm() ? (msg||"<b>Whole hand, flat</b><em>press the palm down as well as the fingers</em>")
+                                   : "<b>Not set up</b><em>tap Set up at the top</em>";
+  }
+  function scanHandle(e){
+    var scale=ppm(); if(!scale||!zoomOk()) return;
+    var n=e.touches.length;
+    if(scanLocked){
+      if(scanWaitLift && n===0){ scanWaitLift=false; scanLocked=false; clearScan(); scanPad.classList.remove("live"); }
+      return;
+    }
+    e.preventDefault();
+    if(n===0){ scanReset(); return; }
+    var rect=scanPad.getBoundingClientRect(), i, xs=[], ys=[];
+    clearScan();
+    for(i=0;i<n;i++){
+      var x=e.touches[i].clientX-rect.left, y=e.touches[i].clientY-rect.top;
+      xs.push(x); ys.push(y);
+      var b=document.createElement("span"); b.className="blob";
+      b.style.left=x+"px"; b.style.top=y+"px"; scanPad.appendChild(b);
+      var c=document.createElement("span"); c.className="blob c";
+      c.style.left=x+"px"; c.style.top=y+"px"; scanPad.appendChild(c);
+    }
+    var x0=Math.min.apply(null,xs), x1=Math.max.apply(null,xs);
+    var y0=Math.min.apply(null,ys), y1=Math.max.apply(null,ys);
+    var wMm=(x1-x0)/scale, hMm=(y1-y0)/scale;
+    var box=document.createElement("div"); box.className="bbox";
+    box.style.left=x0+"px"; box.style.top=y0+"px";
+    box.style.width=(x1-x0)+"px"; box.style.height=(y1-y0)+"px";
+    box.innerHTML='<span class="bw">'+wMm.toFixed(0)+' mm</span><span class="bh">'+hMm.toFixed(0)+' mm</span>';
+    scanPad.appendChild(box);
+    $("scanCounts").innerHTML = n+" contacts<br>"+wMm.toFixed(0)+" wide · "+hMm.toFixed(0)+" long";
+    scanPad.classList.add("live");
+
+    if(n<4){
+      $("scanMsg").innerHTML="<b>"+n+" contact"+(n===1?"":"s")+"</b><em>press more of the hand down — fingers and palm</em>";
+      scanStable=0; $("scanCd").style.width="0"; return;
+    }
+    var now=Date.now();
+    if(!scanLast || Math.abs(wMm-scanLast.w)>2 || Math.abs(hMm-scanLast.h)>2) scanStable=now;
+    scanLast={w:wMm,h:hMm,n:n};
+    if(!scanStable) scanStable=now;
+    var held=now-scanStable, need=900;
+    $("scanCd").style.width=Math.min(100,held/need*100)+"%";
+    $("scanMsg").innerHTML="<b>Hold still</b><em>reading "+(scanRuns.length+1)+" of 3</em>";
+    if(held>need){
+      scanLocked=true; scanWaitLift=true; $("scanCd").style.width="100%";
+      scanRuns.push({w:wMm,h:hMm,n:n});
+      if(scanRuns.length<3){
+        $("scanMsg").innerHTML="<b>Reading "+scanRuns.length+" saved</b><em>lift your hand and place it again</em>";
+      } else {
+        setTimeout(scanReport,250);
+      }
+    }
+  }
+  scanPad.addEventListener("touchstart",scanHandle,{passive:false});
+  scanPad.addEventListener("touchmove",scanHandle,{passive:false});
+  scanPad.addEventListener("touchend",scanHandle,{passive:false});
+  scanPad.addEventListener("touchcancel",function(){ if(!scanLocked) scanReset(); });
+
+  function spreadOf(a){ return Math.max.apply(null,a)-Math.min.apply(null,a); }
+  function medianOf(a){ var b=a.slice().sort(function(x,y){return x-y;}); return b[Math.floor(b.length/2)]; }
+  function sizeFromChart(rows,mm){
+    for(var i=0;i<rows.length;i++){ if(mm>=rows[i].lo&&mm<rows[i].hi) return rows[i]; }
+    return rows[rows.length-1];
+  }
+  function scanReport(){
+    var ws=scanRuns.map(function(r){return r.w;}), hs=scanRuns.map(function(r){return r.h;});
+    var ns=scanRuns.map(function(r){return r.n;});
+    var wSpread=spreadOf(ws), hSpread=spreadOf(hs);
+    var wMed=medianOf(ws), hMed=medianOf(hs);
+    var palmFromWidth=wMed+EDGE_INSET;
+    var lengthLooksReal = hMed>140 && hMed<230;
+    var useLength = lengthLooksReal && hSpread<=wSpread;
+    var html='<div class="report"><table><thead><tr><th></th><th>Reading 1</th><th>2</th><th>3</th>'+
+             '<th>Spread</th></tr></thead><tbody>'+
+      '<tr><td>Width</td><td>'+ws[0].toFixed(0)+'</td><td>'+ws[1].toFixed(0)+'</td><td>'+ws[2].toFixed(0)+
+        '</td><td'+(wSpread<=hSpread?' class="stable"':'')+'>'+wSpread.toFixed(0)+' mm</td></tr>'+
+      '<tr><td>Length</td><td>'+hs[0].toFixed(0)+'</td><td>'+hs[1].toFixed(0)+'</td><td>'+hs[2].toFixed(0)+
+        '</td><td'+(hSpread<wSpread?' class="stable"':'')+'>'+hSpread.toFixed(0)+' mm</td></tr>'+
+      '<tr><td>Contacts</td><td>'+ns[0]+'</td><td>'+ns[1]+'</td><td>'+ns[2]+'</td><td></td></tr>'+
+      '</tbody></table>';
+
+    if(Math.min(wSpread,hSpread)>8){
+      html+='<p class="verdictline">Neither measurement repeated — the best of the three varied by '+
+            Math.min(wSpread,hSpread).toFixed(0)+' mm, which is wider than a glove size. '+
+            'This screen isn\'t giving a steady picture of your hand. Use the gauge.</p></div>';
+      $("scanReport").innerHTML=html;
+      scanRuns=[]; scanReset("<b>Try again</b><em>or go back to the gauge</em>");
+      return;
+    }
+    if(!lengthLooksReal){
+      html+='<p class="verdictline">The palm heel isn\'t registering — the contact cloud is only '+
+            hMed.toFixed(0)+' mm long, which is fingers alone. Press the base of your palm down harder, '+
+            'or use the width reading below.</p>';
+    }
+    var row, mm, basis;
+    if(useLength){ row=sizeFromChart(LENGTH_CHART,hMed); mm=hMed; basis="hand length "+hMed.toFixed(0)+" mm, steady to "+hSpread.toFixed(0)+" mm"; }
+    else { row=sizeFromChart(chart,palmFromWidth); mm=palmFromWidth; basis="contact width "+wMed.toFixed(0)+" mm plus edge allowance, steady to "+wSpread.toFixed(0)+" mm"; }
+    html+='<p class="verdictline">Best reading: <strong>'+row.size+'</strong> — from '+basis+'.</p>'+
+          '<p class="small muted">Check it against the gauge. If they disagree, the gauge is right and the chart needs adjusting.</p></div>';
+    $("scanReport").innerHTML=html;
+    scanRuns=[];
+    scanReset("<b>Scan again</b><em>place your whole hand to repeat</em>");
+  }
+  $("scanRestart").addEventListener("click",function(){ scanRuns=[]; $("scanReport").innerHTML=""; scanReset(); });
+
+  /* ---------- caliper ---------- */
+  var field=$("field"),jawL=$("jawL"),jawR=$("jawR"),bandEl=$("band"),posL=0.38,posR=0.62;
   function drawRuler(){
     var ruler=$("ruler"); ruler.innerHTML=""; var scale=ppm(); if(!scale) return;
     var w=ruler.clientWidth,mm=0,html="";
@@ -650,7 +538,7 @@
   function placeJaws(){
     var w=field.clientWidth,scale=ppm();
     jawL.style.left=(posL*w)+"px"; jawR.style.left=(posR*w)+"px";
-    band.style.left=(Math.min(posL,posR)*w)+"px"; band.style.width=(Math.abs(posR-posL)*w)+"px";
+    bandEl.style.left=(Math.min(posL,posR)*w)+"px"; bandEl.style.width=(Math.abs(posR-posL)*w)+"px";
     var mm=scale?Math.abs(posR-posL)*w/scale:null;
     $("mmOut").textContent=mm?mm.toFixed(0):"—";
     $("inOut").textContent=mm?(mm/25.4).toFixed(2)+" in":"not set up";
@@ -680,66 +568,43 @@
     var box=$("measWarn"),scale=ppm();
     if(!scale){ box.innerHTML='<p class="notice">Not set up yet — tap Set up.</p>'; return; }
     var widthMm=field.clientWidth/scale;
-    box.innerHTML=zoomNote()+(widthMm<140?'<p class="notice">This screen is about '+Math.round(widthMm)+' mm wide — too narrow to lay a hand across.</p>':"");
+    box.innerHTML=zoomNote()+(widthMm<130?'<p class="notice">This screen is about '+Math.round(widthMm)+
+      ' mm wide — too narrow to lay a hand across. Turn it sideways.</p>':"");
   }
   $("lockBtn").addEventListener("click",function(){
-    showResult(Math.abs(posR-posL)*field.clientWidth/ppm(),"Measured with the bars","direct measurement");
+    showResult(Math.abs(posR-posL)*field.clientWidth/ppm(),"Measured with the bars",null);
   });
 
-  /* ---- training ---- */
-  var pendingSpan=null;
-  var trainReader=makeReader($("trainPad"),$("trainMsg"),{
-    idle:"<b>Four knuckles here</b><em>the way students will do it</em>",
-    onLock:function(span){
-      pendingSpan=span; $("trainSpan").value=span.toFixed(1);
-      $("trainAdd").disabled=!$("trainTrue").value;
-      $("trainMsg").innerHTML="<b>Captured "+span.toFixed(0)+" mm</b><em>now enter the tape measurement</em>";
-    }
-  });
-  function resetTrainPad(){ trainReader.reset(); pendingSpan=null; $("trainSpan").value=""; $("trainAdd").disabled=true; }
-  $("trainTrue").addEventListener("input",function(){ $("trainAdd").disabled=!(pendingSpan&&this.value); });
-  $("trainAdd").addEventListener("click",function(){
-    var t=parseFloat($("trainTrue").value);
-    if(!pendingSpan||isNaN(t)||t<50||t>160) return;
-    samples.push({span:Math.round(pendingSpan*10)/10,palm:t});
-    store.set("glove.samples",samples);
-    $("trainTrue").value=""; resetTrainPad(); drawTrain();
-  });
-  function drawTrain(){
-    var tb=$("trainTable").querySelector("tbody"); tb.innerHTML="";
-    var f=fit();
-    samples.forEach(function(s,i){
-      var pred=f?f.a*s.span+f.b:geoEstimate(s.span);
-      var tr=document.createElement("tr");
-      tr.innerHTML="<td>"+(i+1)+"</td><td>"+s.span.toFixed(1)+"</td><td>"+s.palm+"</td><td>"+pred.toFixed(1)+
-        "</td><td>"+(pred-s.palm>=0?"+":"")+(pred-s.palm).toFixed(1)+
-        '</td><td><button class="ghost" data-del="'+i+'">remove</button></td>';
-      tb.appendChild(tr);
-    });
-    var st=$("trainStatus");
-    if(!f){
-      st.innerHTML='<p class="notice">'+samples.length+' of 3 samples. Until there are three, the station uses the geometric estimate.</p>';
-    } else {
-      st.innerHTML='<p class="notice good">Fitted to '+f.n+' hands: palm width = '+f.a.toFixed(3)+' × span '+
-        (f.b>=0?"+ ":"− ")+Math.abs(f.b).toFixed(1)+' mm. Average error '+f.mae.toFixed(1)+' mm.'+
-        (f.mae>6?' That is wider than half a size band — add more samples, or check how people are placing their fingers.':'')+'</p>';
-    }
+  /* ---------- result ---------- */
+  function sizeFor(mm){
+    for(var i=0;i<chart.length;i++){ if(mm>=chart[i].lo&&mm<chart[i].hi) return chart[i]; }
+    return chart[chart.length-1];
   }
-  $("trainTable").addEventListener("click",function(e){
-    var t=e.target; if(!t||!t.dataset||t.dataset.del===undefined) return;
-    samples.splice(Number(t.dataset.del),1); store.set("glove.samples",samples); drawTrain();
-  });
-  $("trainExport").addEventListener("click",function(){
-    var ta=$("trainOut"); ta.style.display="block";
-    ta.value="span_mm,true_palm_mm\n"+samples.map(function(s){return s.span+","+s.palm;}).join("\n");
-    ta.select();
-  });
-  $("trainClear").addEventListener("click",function(){
-    if(!samples.length) return;
-    samples=[]; store.set("glove.samples",samples); drawTrain();
-  });
+  function showResult(mm,method,bandRow){
+    var r=bandRow||sizeFor(mm), circ=mm*2.2;
+    $("resSize").textContent=r.size;
+    $("resLine").textContent=ADVICE[r.size]||("Reach for the "+r.size+" box.");
+    $("resMm").textContent = bandRow
+      ? (r.hi<900 ? r.lo+"–"+r.hi+" mm" : r.lo+" mm and over")
+      : mm.toFixed(0)+" mm  ("+(mm/25.4).toFixed(2)+" in)";
+    $("resCirc").textContent="about "+(circ/25.4).toFixed(1)+" in";
+    $("resSurg").textContent=(Math.round(circ/25.4*2)/2).toFixed(1);
+    $("resMethod").textContent=method;
+    show("result");
+    var left=16000, fill=$("resetFill"); fill.style.width="100%";
+    resetTimer=setInterval(function(){
+      left-=200; fill.style.width=Math.max(0,left/16000*100)+"%";
+      if(left<=0){ clearInterval(resetTimer); resetTimer=null; show("gauge"); }
+    },200);
+    views.result.addEventListener("touchstart",function once(){
+      if(resetTimer){ clearInterval(resetTimer); resetTimer=null; fill.style.width="0"; }
+      views.result.removeEventListener("touchstart",once);
+    },{passive:true});
+  }
+  $("againBtn").addEventListener("click",function(){ show("gauge"); });
+  $("resChart").addEventListener("click",function(){ show("chart"); });
 
-  /* ---- set up ---- */
+  /* ---------- set up ---------- */
   function presetPpmm(p){
     if(p.kind==="fixed") return p.ppmm;
     var cssWide=(window.screen&&window.screen.width)?window.screen.width:window.innerWidth;
@@ -750,23 +615,19 @@
     PRESETS.forEach(function(p){
       var b=document.createElement("button");
       b.className="preset"+(chosen===p.id?" on":"");
-      b.innerHTML="<b>"+p.name+"</b><em>"+p.note+"</em>"+
-        (detected===p.id?'<span class="det">detected</span>':"");
-      b.addEventListener("click",function(){
-        chosen=p.id; trim=1; pxPerMm=presetPpmm(p); drawPresets(); paintCheck();
-      });
+      b.innerHTML="<b>"+p.name+"</b><em>"+p.note+"</em>"+(detected===p.id?'<span class="det">detected</span>':"");
+      b.addEventListener("click",function(){ chosen=p.id; trim=1; pxPerMm=presetPpmm(p); drawPresets(); paintCheck(); });
       box.appendChild(b);
     });
   }
   function paintCheck(){
     var bar=$("checkBar");
     if(!pxPerMm){ bar.style.width="0"; $("calReadout").textContent="Pick a device to continue."; $("calWarn").innerHTML=""; return; }
-    var eff=ppm();
-    bar.style.width=(100*eff)+"px";
-    $("calReadout").textContent=eff.toFixed(3)+" pixels per mm · adjusted "+Math.round((trim-1)*100)+"%";
+    bar.style.width=(100*ppm())+"px";
+    $("calReadout").textContent=ppm().toFixed(3)+" pixels per mm · adjusted "+Math.round((trim-1)*100)+"%";
     var cur=null; PRESETS.forEach(function(p){ if(p.id===chosen) cur=p; });
     var warn=zoomNote();
-    if(cur && cur.kind==="screen"){
+    if(cur&&cur.kind==="screen"){
       var innerCss=window.innerWidth, screenCss=(window.screen&&window.screen.width)?window.screen.width:innerCss;
       if(innerCss<screenCss*0.95)
         warn+='<p class="notice">This window isn\'t filling the screen, so the scale will be wrong. Go full screen and pick the device again.</p>';
@@ -779,7 +640,7 @@
   $("calSave").addEventListener("click",function(){
     if(!pxPerMm) return;
     store.set("glove.pxPerMm",pxPerMm); store.set("glove.trim",trim); store.set("glove.preset",chosen);
-    show("auto");
+    show("gauge");
   });
   var slider=$("calSlider");
   slider.addEventListener("input",function(){
@@ -789,10 +650,10 @@
   $("cardSave").addEventListener("click",function(){
     pxPerMm=Number(slider.value)/CARD_MM; trim=1; chosen=null;
     store.set("glove.pxPerMm",pxPerMm); store.set("glove.trim",1); store.set("glove.preset",null);
-    show("auto");
+    show("gauge");
   });
 
-  /* ---- chart ---- */
+  /* ---------- chart ---------- */
   function drawChart(){
     var tb=$("chartTable").querySelector("tbody"); tb.innerHTML="";
     chart.forEach(function(row,i){
@@ -808,37 +669,83 @@
     Array.prototype.slice.call($("chartTable").querySelectorAll("input")).forEach(function(inp){
       var v=parseFloat(inp.value); if(!isNaN(v)) chart[Number(inp.dataset.i)][inp.dataset.k]=v;
     });
-    store.set("glove.chart",chart); drawChart(); show("auto");
+    store.set("glove.chart",chart); drawChart(); show("gauge");
   });
   $("chartReset").addEventListener("click",function(){
     chart=DEFAULTS.map(function(r){return {size:r.size,lo:r.lo,hi:r.hi};});
     store.set("glove.chart",chart); drawChart();
   });
 
-  /* ---- nav ---- */
-  $("navGauge").addEventListener("click",function(){ show("gauge"); });
+  /* ---------- nav ---------- */
+  $("navScan").addEventListener("click",function(){ show("scan"); });
+  $("toScan").addEventListener("click",function(){ show("scan"); });
+  $("scanBack").addEventListener("click",function(){ show("gauge"); });
+  $("navMeasure").addEventListener("click",function(){ show("measure"); });
   $("navCal").addEventListener("click",function(){ show("cal"); });
-  $("navTrain").addEventListener("click",function(){ show("train"); });
   $("navChart").addEventListener("click",function(){ show("chart"); });
-  $("toGauge").addEventListener("click",function(){ show("gauge"); });
-  $("toCaliper").addEventListener("click",function(){ show("measure"); });
-  $("gaugeBack").addEventListener("click",function(){ show("auto"); });
-  $("calBack").addEventListener("click",function(){ show("auto"); });
-  $("chartBack").addEventListener("click",function(){ show("auto"); });
-  $("trainBack").addEventListener("click",function(){ show("auto"); });
+  $("measBack").addEventListener("click",function(){ show("gauge"); });
+  $("chartBack").addEventListener("click",function(){ show("gauge"); });
   window.addEventListener("resize",function(){
     if(current==="gauge") drawGauge();
     if(current==="measure"){ drawRuler(); placeJaws(); checkScreen(); }
     if(current==="cal") paintCheck();
-    if(current==="auto") sizeSilhouette();
   });
   document.addEventListener("gesturestart",function(e){ e.preventDefault(); });
 
-  // first run on an iPad: pre-select the detected device so set-up is one tap
-  if(!pxPerMm && detected){
+  /* ---------- full screen ----------
+     Browsers only grant it from a tap, so it can't be forced on load. On iPad the
+     real answer is Add to Home Screen, which opens with no browser chrome at all. */
+  function isStandalone(){
+    return (window.navigator.standalone === true) ||
+           (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+           (window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches);
+  }
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function fsSupported(){
+    var d=document.documentElement;
+    return !!(d.requestFullscreen || d.webkitRequestFullscreen) &&
+           (document.fullscreenEnabled !== false);
+  }
+  function enterFs(){
+    var d=document.documentElement;
+    var fn=d.requestFullscreen||d.webkitRequestFullscreen;
+    if(fn) try{ fn.call(d); }catch(e){}
+  }
+  function exitFs(){
+    var fn=document.exitFullscreen||document.webkitExitFullscreen;
+    if(fn) try{ fn.call(document); }catch(e){}
+  }
+  var fsBtn=$("fsBtn");
+  function syncFs(){
+    if(isStandalone() || !fsSupported()){ fsBtn.hidden=true; return; }
+    fsBtn.hidden=false;
+    fsBtn.textContent = fsElement() ? "Exit full screen" : "Full screen";
+  }
+  fsBtn.addEventListener("click",function(){ fsElement() ? exitFs() : enterFs(); });
+  document.addEventListener("fullscreenchange",syncFs);
+  document.addEventListener("webkitfullscreenchange",syncFs);
+  syncFs();
+
+  // iPad in Safari: point at Add to Home Screen once, then stop nagging
+  (function(){
+    var tip=$("a2hs");
+    if(isStandalone() || store.get("glove.tipSeen",false)){ tip.hidden=true; return; }
+    var ios=/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints>1);
+    if(!ios && fsSupported()){ tip.hidden=true; return; }
+    tip.hidden=false;
+    tip.innerHTML='<span>To run this full screen with no browser bars: tap the Share button, '+
+                  'then <strong>Add to Home Screen</strong>. Open it from the new icon.</span>'+
+                  '<button class="ghost" id="tipGo">Got it</button>';
+    $("tipGo").addEventListener("click",function(){
+      store.set("glove.tipSeen",true); tip.hidden=true;
+    });
+  })();
+
+  if(!pxPerMm&&detected){
     PRESETS.forEach(function(p){ if(p.id===detected){ chosen=p.id; pxPerMm=presetPpmm(p); } });
   }
-  show(store.get("glove.pxPerMm",null) ? "auto" : "cal");
+  show(store.get("glove.pxPerMm",null)?"gauge":"cal");
 })();
 </script>
 </body>
