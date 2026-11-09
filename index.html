@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Glove Sizing">
+<meta name="theme-color" content="#E7EBE5">
+<title>Glove Sizing Station</title>
+<style>
+  :root{
+    --ground:#E7EBE5; --panel:#FBFCFA; --ink:#16262B; --muted:#5E7077;
+    --rule:#C3CCC5; --nitrile:#2742C8; --lavender:#7B5FC4; --alert:#9A3B2A; --ok:#2E7D5B;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#11191C; --panel:#182225; --ink:#E6EDE8; --muted:#90A49C;
+      --rule:#2D3B3F; --nitrile:#8AA0FF; --lavender:#B49BF0; --alert:#E08A72; --ok:#6FC79E;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#11191C; --panel:#182225; --ink:#E6EDE8; --muted:#90A49C;
+    --rule:#2D3B3F; --nitrile:#8AA0FF; --lavender:#B49BF0; --alert:#E08A72; --ok:#6FC79E;
+    color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+  body{margin:0;min-height:100%;background:var(--ground);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:18px;line-height:1.5;-webkit-font-smoothing:antialiased;
+    overscroll-behavior:none}
+  .wrap{max-width:1500px;margin:0 auto;padding:14px 22px 36px}
+  header.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:14px}
+  .mark{font-weight:600;font-size:18px;letter-spacing:-0.01em}
+  .mark span{color:var(--muted);font-weight:400}
+  .barlinks{display:flex;gap:5px;flex-wrap:wrap}
+  button{font:inherit;color:inherit}
+  .ghost{background:none;border:1px solid var(--rule);border-radius:999px;padding:8px 15px;
+    cursor:pointer;color:var(--muted);font-size:14.5px}
+  .ghost:hover{border-color:var(--ink);color:var(--ink)}
+  .solid{background:var(--nitrile);color:var(--panel);border:0;border-radius:10px;
+    padding:15px 26px;font-size:18px;font-weight:600;cursor:pointer;min-height:56px}
+  .solid:disabled{opacity:.35;cursor:default}
+  .line{background:none;border:1px solid var(--ink);border-radius:10px;padding:14px 24px;
+    font-size:17px;font-weight:500;cursor:pointer;min-height:56px}
+  :focus-visible{outline:3px solid var(--lavender);outline-offset:3px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;
+    font-size:clamp(30px,4vw,52px);line-height:1.05;letter-spacing:-0.015em;margin:0 0 8px}
+  h2{font-size:19px;font-weight:600;margin:0 0 8px}
+  p{margin:0 0 13px;max-width:64ch}
+  .muted{color:var(--muted)} .small{font-size:15px}
+  .view{display:none} .view.on{display:block}
+  .row{display:flex;gap:11px;flex-wrap:wrap;align-items:center}
+
+  .pad{position:relative;background:var(--panel);border:2px dashed var(--rule);border-radius:16px;
+    height:clamp(280px,50vh,600px);margin:10px 0;touch-action:none;overflow:hidden;
+    user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center}
+  .pad.live{border-style:solid;border-color:var(--nitrile)}
+  .pad.done{border-style:solid;border-color:var(--ok)}
+  .padmsg{text-align:center;pointer-events:none;max-width:34ch;z-index:2;padding:0 16px}
+  .padmsg b{display:block;font-size:clamp(21px,3vw,32px);font-weight:600;margin-bottom:5px}
+  .padmsg em{font-style:normal;color:var(--muted);font-size:16.5px}
+  .dot{position:absolute;width:62px;height:62px;border-radius:50%;background:var(--nitrile);
+    opacity:.2;transform:translate(-50%,-50%);pointer-events:none}
+  .dot.core{width:13px;height:13px;opacity:.9}
+  .spanline{position:absolute;height:3px;background:var(--nitrile);opacity:.5;pointer-events:none}
+  .countdown{position:absolute;left:0;bottom:0;height:6px;background:var(--nitrile);width:0}
+  .live-mm{position:absolute;right:16px;top:12px;font-family:Georgia,serif;font-size:36px;
+    color:var(--muted);font-variant-numeric:tabular-nums;pointer-events:none}
+
+  .verdict{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;margin:12px 0}
+  .sizeletter{font-family:Georgia,"Times New Roman",serif;font-size:clamp(84px,16vw,190px);
+    line-height:.8;letter-spacing:-0.03em;margin:4px 0 10px;color:var(--nitrile)}
+  dl.facts{margin:16px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 20px;font-size:16.5px}
+  dl.facts dt{color:var(--muted)} dl.facts dd{margin:0;font-variant-numeric:tabular-nums}
+  .pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;padding:4px 13px;
+    font-size:13.5px;color:var(--muted)}
+  .resetbar{height:4px;background:var(--rule);border-radius:2px;margin-top:18px;overflow:hidden}
+  .resetbar i{display:block;height:100%;background:var(--muted);width:100%}
+
+  .gauge{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    height:clamp(300px,46vh,440px);margin:12px 0;overflow:hidden}
+  .gline{position:absolute;top:0;bottom:0;width:2px;background:var(--rule)}
+  .gline.mid{background:var(--lavender)}
+  .glabel{position:absolute;top:10px;transform:translateX(-50%);font-size:13px;color:var(--muted);
+    font-variant-numeric:tabular-nums}
+  .gband{position:absolute;bottom:14px;transform:translateX(-50%);text-align:center}
+  .gband b{display:block;font-size:26px;font-weight:700;color:var(--nitrile);line-height:1}
+  .gband em{font-style:normal;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .ghint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;
+    color:var(--muted);max-width:28ch;pointer-events:none}
+  .stage{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+    overflow:hidden;margin:12px 0;touch-action:none;user-select:none;-webkit-user-select:none}
+  .ruler{position:relative;height:36px;border-bottom:1px solid var(--rule)}
+  .tick{position:absolute;top:0;width:1px;background:var(--rule)}
+  .tick.maj{background:var(--muted);height:14px} .tick.min{height:8px}
+  .tnum{position:absolute;top:16px;font-size:11.5px;color:var(--muted);transform:translateX(-50%);
+    font-variant-numeric:tabular-nums}
+  .field{position:relative;height:clamp(220px,34vh,300px)}
+  .jaw{position:absolute;top:0;bottom:0;width:3px;background:var(--nitrile);cursor:ew-resize}
+  .jaw .grip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:86px;
+    border-radius:8px;background:var(--nitrile);display:flex;align-items:center;justify-content:center;gap:4px}
+  .grip i{display:block;width:2px;height:30px;background:var(--panel);opacity:.8;border-radius:2px}
+  .spanband{position:absolute;top:50%;height:2px;background:var(--nitrile);opacity:.35}
+  .readout{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;margin:2px 0 14px}
+  .mm{font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,7vw,78px);line-height:.9;
+    letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+  .unit{font-size:18px;color:var(--muted)}
+  .inches{font-size:16.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .cardbox{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:20px;margin:12px 0}
+  .presets{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .preset{border:1px solid var(--rule);background:var(--ground);border-radius:10px;padding:13px 17px;
+    cursor:pointer;text-align:left;min-width:200px;position:relative}
+  .preset.on{border-color:var(--nitrile);box-shadow:inset 0 0 0 1px var(--nitrile)}
+  .preset b{display:block;font-size:16.5px;font-weight:600}
+  .preset em{font-style:normal;font-size:13.5px;color:var(--muted)}
+  .preset .det{position:absolute;top:-9px;right:10px;background:var(--ok);color:var(--panel);
+    font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px}
+  .checkbar{height:26px;background:var(--lavender);border-radius:5px;margin:12px 0 6px;position:relative}
+  .checkbar::after{content:"100 mm — check with a ruler";position:absolute;left:8px;top:50%;
+    transform:translateY(-50%);color:var(--panel);font-size:12.5px;font-weight:600;white-space:nowrap}
+  table{border-collapse:collapse;width:100%;font-size:15.5px;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:9px;border-bottom:1px solid var(--rule)}
+  th{font-weight:600;color:var(--muted);font-size:13.5px}
+  input[type=text],input[type=number],td input{font:inherit;padding:10px;border:1px solid var(--rule);
+    border-radius:8px;background:var(--ground);color:var(--ink);width:7em}
+  textarea{width:100%;min-height:110px;font:14px ui-monospace,Menlo,Consolas,monospace;
+    border:1px solid var(--rule);border-radius:8px;background:var(--ground);color:var(--ink);padding:10px}
+  .notice{border-left:3px solid var(--alert);padding:2px 0 2px 14px;margin:13px 0;font-size:15.5px;max-width:64ch}
+  .notice.good{border-left-color:var(--ok)}
+  .scroller{overflow-x:auto}
+  footer{margin-top:28px;padding-top:12px;border-top:1px solid var(--rule);color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="bar">
+  <div class="mark">Glove Sizing <span id="markSub">— simulation lab</span></div>
+  <div class="barlinks">
+    <button class="ghost" id="navGauge">Gauge</button>
+    <button class="ghost" id="navCal">Set up</button>
+    <button class="ghost" id="navTrain">Train</button>
+    <button class="ghost" id="navChart">Chart</button>
+  </div>
+</header>
+
+<!-- AUTO -->
+<section class="view" id="v-auto">
+  <h1>Put your hand on the screen</h1>
+  <p>Lay four fingers flat in the box — index, middle, ring, little. Keep them touching each other, thumb off the screen. Hold still and your size appears.</p>
+  <div class="pad" id="pad">
+    <span class="padmsg" id="padMsg"><b>Four fingers here</b><em>flat and together</em></span>
+    <span class="countdown" id="cdown"></span>
+  </div>
+  <div class="row">
+    <button class="ghost" id="toGauge">Use the life-size gauge</button>
+    <button class="ghost" id="toCaliper">Measure with bars</button>
+  </div>
+  <div id="autoWarn"></div>
+</section>
+
+<!-- RESULT -->
+<section class="view" id="v-result">
+  <div class="verdict">
+    <span class="pill" id="resMethod"></span>
+    <div class="sizeletter" id="resSize">M</div>
+    <p id="resLine" style="font-size:20px;margin:0"></p>
+    <dl class="facts">
+      <dt>Palm width</dt><dd id="resMm"></dd>
+      <dt>Palm circumference</dt><dd id="resCirc"></dd>
+      <dt>Surgical size</dt><dd id="resSurg"></dd>
+      <dt>Based on</dt><dd id="resConf"></dd>
+    </dl>
+    <div class="resetbar"><i id="resetFill"></i></div>
+  </div>
+  <div class="row">
+    <button class="solid" id="againBtn">Measure again</button>
+    <button class="line" id="resChart">See the chart</button>
+  </div>
+  <p class="small muted">If this feels tight across the knuckles or loose at the fingertips, try the next size. Brands run differently.</p>
+</section>
+
+<!-- GAUGE -->
+<section class="view" id="v-gauge">
+  <h1>Life-size gauge</h1>
+  <p>Hold your hand flat against the screen, fingers together, thumb tucked, palm centred on the purple line. Read which pair of marks your knuckles land between.</p>
+  <div class="gauge" id="gauge"><div class="ghint" id="gaugeHint"></div></div>
+  <button class="line" id="gaugeBack">Back</button>
+</section>
+
+<!-- CALIPER -->
+<section class="view" id="v-measure">
+  <h1>Measure with the bars</h1>
+  <p>Slide the bars until they touch each side of your hand at the knuckles. Drag with your other hand.</p>
+  <div class="stage" id="stage">
+    <div class="ruler" id="ruler" aria-hidden="true"></div>
+    <div class="field" id="field">
+      <div class="spanband" id="band"></div>
+      <div class="jaw" id="jawL" role="slider" aria-label="Left edge" tabindex="0"><span class="grip"><i></i><i></i></span></div>
+      <div class="jaw" id="jawR" role="slider" aria-label="Right edge" tabindex="0"><span class="grip"><i></i><i></i></span></div>
+    </div>
+  </div>
+  <div class="readout"><span class="mm" id="mmOut">—</span><span class="unit">mm across</span>
+    <span class="inches" id="inOut"></span></div>
+  <div class="row">
+    <button class="solid" id="lockBtn">Show my size</button>
+    <button class="line" id="calBack">Back</button>
+  </div>
+  <div id="measWarn"></div>
+</section>
+
+<!-- SET UP -->
+<section class="view" id="v-cal">
+  <h1>Set up this screen</h1>
+  <p class="muted">Pick the device this is running on. Everything the station measures depends on this.</p>
+  <div class="cardbox">
+    <div class="presets" id="presets"></div>
+    <p class="small muted" id="calReadout"></p>
+    <div class="checkbar" id="checkBar"></div>
+    <p class="small muted">Hold a ruler to the purple bar. If it isn't 100 mm:
+      <button class="ghost" id="nudgeDown">−1%</button>
+      <button class="ghost" id="nudgeUp">+1%</button>
+      <button class="ghost" id="nudgeReset">reset</button>
+    </p>
+    <div class="row" style="margin-top:12px"><button class="solid" id="calSave">Save and start</button></div>
+    <div id="calWarn"></div>
+  </div>
+  <details><summary class="muted small" style="cursor:pointer;padding:8px 0">Device not listed? Use a card</summary>
+    <div class="cardbox">
+      <p class="small muted">Lay any ID or debit card on the screen and drag until the blue bar matches its long edge.</p>
+      <div style="background:var(--nitrile);border-radius:10px;height:56px" id="cardShape"></div>
+      <input type="range" id="calSlider" min="40" max="1600" value="320" style="width:100%;height:44px;accent-color:var(--nitrile)" aria-label="Card width">
+      <button class="line" id="cardSave">Use this scale</button>
+    </div>
+  </details>
+</section>
+
+<!-- TRAIN -->
+<section class="view" id="v-train">
+  <h1>Train the automatic reading</h1>
+  <p>Out of the box the station works palm width out geometrically from finger spacing. Measure a handful of real hands here and it fits itself to your students instead.</p>
+  <div class="cardbox">
+    <h2>1 · Capture a hand</h2>
+    <div class="pad" id="trainPad" style="height:240px">
+      <span class="padmsg" id="trainMsg"><b>Four fingers here</b><em>the way students will do it</em></span>
+    </div>
+    <h2>2 · Tape-measure the same hand</h2>
+    <p class="small muted">Across the knuckles, thumb excluded, hand flat.</p>
+    <div class="row">
+      <label class="small muted">Captured span <input type="text" id="trainSpan" readonly></label>
+      <label class="small muted">True palm width (mm) <input type="number" id="trainTrue" inputmode="decimal"></label>
+      <button class="solid" id="trainAdd" disabled>Add sample</button>
+    </div>
+    <div id="trainStatus"></div>
+  </div>
+  <div class="cardbox">
+    <h2>Samples</h2>
+    <div class="scroller"><table id="trainTable">
+      <thead><tr><th>#</th><th>Span</th><th>True</th><th>Predicted</th><th>Error</th><th></th></tr></thead>
+      <tbody></tbody></table></div>
+    <div class="row" style="margin-top:12px">
+      <button class="line" id="trainExport">Show data to copy</button>
+      <button class="ghost" id="trainClear">Clear samples</button>
+      <button class="ghost" id="trainBack">Back</button>
+    </div>
+    <textarea id="trainOut" style="display:none" readonly></textarea>
+  </div>
+</section>
+
+<!-- CHART -->
+<section class="view" id="v-chart">
+  <h1>Size chart</h1>
+  <p class="muted">Palm width across the knuckles, thumb excluded. Edit to match the boxes the lab stocks.</p>
+  <div class="scroller"><table id="chartTable">
+    <thead><tr><th>Size</th><th>From (mm)</th><th>Up to (mm)</th><th>Inches</th></tr></thead>
+    <tbody></tbody></table></div>
+  <div class="row" style="margin-top:14px">
+    <button class="solid" id="chartSave">Save chart</button>
+    <button class="line" id="chartReset">Reset to defaults</button>
+    <button class="ghost" id="chartBack">Back</button>
+  </div>
+</section>
+
+<footer>Set-up, training samples and chart edits are stored on this device only.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var CARD_MM = 85.6;
+  // kind "fixed": pixels per mm is a property of the panel (known pixel density).
+  // kind "screen": derived from the screen's CSS width over the panel's real width (needs full screen).
+  var PRESETS = [
+    {id:"ipad",   name:"iPad (9.7\" – 12.9\")", note:"264 ppi — exact, any orientation", kind:"fixed",  ppmm:5.197},
+    {id:"ipadmini",name:"iPad mini",            note:"326 ppi — exact",                  kind:"fixed",  ppmm:6.417},
+    {id:"lg86",   name:"LG 86\" CreateBoard",   note:"1895 mm active width",             kind:"screen", mm:1895.0},
+    {id:"lg65",   name:"LG 65\" TV",            note:"1428 mm active width",             kind:"screen", mm:1428.5},
+    {id:"dell24", name:"Dell Pro 24\" monitor", note:"527 mm active width",              kind:"screen", mm:527.0}
+  ];
+  var DEFAULTS = [
+    {size:"XS",lo:0,hi:76},{size:"S",lo:76,hi:86},{size:"M",lo:86,hi:97},
+    {size:"L",lo:97,hi:108},{size:"XL",lo:108,hi:999}
+  ];
+  var ADVICE = {XS:"Reach for the extra-small box.",S:"Reach for the small box.",
+                M:"Reach for the medium box.",L:"Reach for the large box.",XL:"Reach for the extra-large box."};
+
+  var store = {
+    get:function(k,f){try{var v=localStorage.getItem(k);return v===null?f:JSON.parse(v);}catch(e){return f;}},
+    set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  };
+  var $ = function(id){return document.getElementById(id);};
+
+  var pxPerMm = store.get("glove.pxPerMm", null);
+  var trim    = store.get("glove.trim", 1);
+  var chosen  = store.get("glove.preset", null);
+  var chart   = store.get("glove.chart", null) || DEFAULTS.map(function(r){return {size:r.size,lo:r.lo,hi:r.hi};});
+  var samples = store.get("glove.samples", []);
+  function ppm(){ return pxPerMm ? pxPerMm*trim : null; }
+
+  /* ---- device detection ---- */
+  function detectPreset(){
+    var ua = navigator.userAgent || "";
+    var isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    if(isIpad){
+      var mn = Math.min(screen.width, screen.height);
+      return mn <= 768 ? "ipadmini" : "ipad";
+    }
+    return null;
+  }
+  var detected = detectPreset();
+
+  var views = {auto:$("v-auto"),result:$("v-result"),gauge:$("v-gauge"),measure:$("v-measure"),
+               cal:$("v-cal"),train:$("v-train"),chart:$("v-chart")};
+  var current = "auto", resetTimer = null;
+  function show(n){
+    current = n;
+    if(resetTimer){ clearInterval(resetTimer); resetTimer = null; }
+    for(var k in views){ views[k].classList.toggle("on", k===n); }
+    window.scrollTo(0,0);
+    if(n==="auto"){ resetPad(); checkAuto(); }
+    if(n==="gauge") drawGauge();
+    if(n==="measure"){ drawRuler(); placeJaws(); checkScreen(); }
+    if(n==="cal"){ drawPresets(); paintCheck(); }
+    if(n==="train"){ drawTrain(); resetTrainPad(); }
+    if(n==="chart") drawChart();
+  }
+
+  /* ---- zoom guard: pinch-zoom silently breaks every measurement ---- */
+  function zoomOk(){
+    if(!window.visualViewport) return true;
+    return Math.abs(window.visualViewport.scale - 1) < 0.02;
+  }
+  function zoomNote(){
+    return zoomOk() ? "" :
+      '<p class="notice">The screen is zoomed in, so every measurement here is wrong. Pinch back out to normal size.</p>';
+  }
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", function(){
+      if(current==="auto") checkAuto();
+      if(current==="measure") checkScreen();
+    });
+  }
+
+  /* ---- fit: finger span -> palm width ---- */
+  function geoEstimate(span){ return span*4/3; }
+  function fit(){
+    if(samples.length < 3) return null;
+    var n=samples.length,sx=0,sy=0,sxx=0,sxy=0;
+    samples.forEach(function(s){ sx+=s.span; sy+=s.palm; sxx+=s.span*s.span; sxy+=s.span*s.palm; });
+    var d=n*sxx-sx*sx; if(Math.abs(d)<1e-6) return null;
+    var a=(n*sxy-sx*sy)/d, b=(sy-a*sx)/n, err=0;
+    samples.forEach(function(s){ err += Math.abs(a*s.span+b-s.palm); });
+    return {a:a,b:b,n:n,mae:err/n};
+  }
+  function estimate(span){
+    var f=fit();
+    if(f) return {mm:f.a*span+f.b, how:f.n+" measured hands, typically within "+f.mae.toFixed(0)+" mm"};
+    return {mm:geoEstimate(span), how:"finger spacing — not trained on real hands yet"};
+  }
+
+  /* ---- touch reading ---- */
+  function spanFromTouches(touches, rect, scale){
+    var xs=[],i;
+    for(i=0;i<touches.length;i++) xs.push(touches[i].clientX-rect.left);
+    xs.sort(function(a,b){return a-b;});
+    if(xs.length<4) return null;
+    if(xs.length===4) return (xs[3]-xs[0])/scale;
+    var best=null,bestScore=Infinity;
+    for(i=0;i+3<xs.length;i++){
+      var g=[xs[i+1]-xs[i],xs[i+2]-xs[i+1],xs[i+3]-xs[i+2]];
+      var mean=(g[0]+g[1]+g[2])/3; if(mean<=0) continue;
+      var v=(Math.abs(g[0]-mean)+Math.abs(g[1]-mean)+Math.abs(g[2]-mean))/mean;
+      if(v<bestScore){ bestScore=v; best=xs[i+3]-xs[i]; }
+    }
+    return best===null?null:best/scale;
+  }
+  function makeReader(padEl,msgEl,opts){
+    var lastSpan=0,stableSince=0,locked=false,cd=opts.countdown?$(opts.countdown):null;
+    function clearDots(){
+      Array.prototype.slice.call(padEl.querySelectorAll(".dot,.spanline,.live-mm")).forEach(function(d){d.remove();});
+    }
+    function paint(touches,rect,span){
+      clearDots();
+      var i,minX=Infinity,maxX=-Infinity,yAvg=0;
+      for(i=0;i<touches.length;i++){
+        var x=touches[i].clientX-rect.left, y=touches[i].clientY-rect.top;
+        minX=Math.min(minX,x); maxX=Math.max(maxX,x); yAvg+=y;
+        var d=document.createElement("span"); d.className="dot";
+        d.style.left=x+"px"; d.style.top=y+"px"; padEl.appendChild(d);
+        var c=document.createElement("span"); c.className="dot core";
+        c.style.left=x+"px"; c.style.top=y+"px"; padEl.appendChild(c);
+      }
+      yAvg/=touches.length;
+      if(span!==null){
+        var l=document.createElement("span"); l.className="spanline";
+        l.style.left=minX+"px"; l.style.width=(maxX-minX)+"px";
+        l.style.top=Math.min(rect.height-20,yAvg+52)+"px"; padEl.appendChild(l);
+        var r=document.createElement("span"); r.className="live-mm";
+        r.textContent=span.toFixed(0)+" mm"; padEl.appendChild(r);
+      }
+    }
+    function reset(){
+      locked=false; stableSince=0; lastSpan=0; clearDots();
+      padEl.classList.remove("live","done");
+      if(cd) cd.style.width="0";
+      msgEl.innerHTML = ppm() ? opts.idle : "<b>Not set up</b><em>tap Set up at the top</em>";
+    }
+    function handle(e){
+      var scale=ppm(); if(!scale||locked||!zoomOk()) return;
+      e.preventDefault();
+      var rect=padEl.getBoundingClientRect(), n=e.touches.length;
+      if(n===0){ reset(); return; }
+      var span=spanFromTouches(e.touches,rect,scale);
+      paint(e.touches,rect,span);
+      padEl.classList.add("live");
+      if(span===null){
+        msgEl.innerHTML="<b>"+n+" of 4 fingers</b><em>lay them flat and together</em>";
+        stableSince=0; if(cd) cd.style.width="0"; return;
+      }
+      var now=Date.now();
+      if(Math.abs(span-lastSpan)>1.5) stableSince=now;
+      lastSpan=span; if(!stableSince) stableSince=now;
+      var held=now-stableSince, need=900;
+      if(cd) cd.style.width=Math.min(100,held/need*100)+"%";
+      msgEl.innerHTML="<b>Hold still</b><em>reading your hand</em>";
+      if(held>need && span>35 && span<130){
+        locked=true; padEl.classList.remove("live"); padEl.classList.add("done");
+        if(cd) cd.style.width="100%";
+        opts.onLock(span);
+      }
+    }
+    padEl.addEventListener("touchstart",handle,{passive:false});
+    padEl.addEventListener("touchmove",handle,{passive:false});
+    padEl.addEventListener("touchend",handle,{passive:false});
+    padEl.addEventListener("touchcancel",function(){ reset(); });
+    return {reset:reset};
+  }
+
+  var autoReader = makeReader($("pad"),$("padMsg"),{
+    idle:"<b>Four fingers here</b><em>flat and together</em>",
+    countdown:"cdown",
+    onLock:function(span){
+      var est=estimate(span);
+      setTimeout(function(){ showResult(est.mm,"Read from your hand",est.how); },300);
+    }
+  });
+  function resetPad(){ autoReader.reset(); }
+  function checkAuto(){
+    var box=$("autoWarn");
+    if(!ppm()){ box.innerHTML='<p class="notice">This screen hasn\'t been set up yet. Tap Set up at the top.</p>'; return; }
+    var hasTouch=("ontouchstart" in window)||(navigator.maxTouchPoints>1);
+    box.innerHTML = zoomNote() + (hasTouch ? "" :
+      '<p class="notice">This device isn\'t reporting multi-touch, so the automatic reading won\'t work. Use the gauge or the bars.</p>');
+  }
+
+  /* ---- result ---- */
+  function sizeFor(mm){
+    for(var i=0;i<chart.length;i++){ if(mm>=chart[i].lo&&mm<chart[i].hi) return chart[i].size; }
+    return chart[chart.length-1].size;
+  }
+  function showResult(mm,method,basis){
+    var s=sizeFor(mm), circ=mm*2.2;
+    $("resSize").textContent=s;
+    $("resLine").textContent=ADVICE[s]||("Reach for the "+s+" box.");
+    $("resMm").textContent=mm.toFixed(0)+" mm  ("+(mm/25.4).toFixed(2)+" in)";
+    $("resCirc").textContent="about "+(circ/25.4).toFixed(1)+" in";
+    $("resSurg").textContent=(Math.round(circ/25.4*2)/2).toFixed(1);
+    $("resMethod").textContent=method;
+    $("resConf").textContent=basis||"direct measurement";
+    show("result");
+    // idle reset so the next person starts clean
+    var left=18000, fill=$("resetFill");
+    fill.style.width="100%";
+    resetTimer=setInterval(function(){
+      left-=200; fill.style.width=Math.max(0,left/18000*100)+"%";
+      if(left<=0){ clearInterval(resetTimer); resetTimer=null; show("auto"); }
+    },200);
+    views.result.addEventListener("touchstart",function stopOnce(){
+      if(resetTimer){ clearInterval(resetTimer); resetTimer=null; fill.style.width="0"; }
+      views.result.removeEventListener("touchstart",stopOnce);
+    },{passive:true});
+  }
+  $("againBtn").addEventListener("click",function(){ show("auto"); });
+  $("resChart").addEventListener("click",function(){ show("chart"); });
+
+  /* ---- gauge ---- */
+  function drawGauge(){
+    var g=$("gauge"),scale=ppm();
+    g.innerHTML='<div class="ghint" id="gaugeHint"></div>';
+    if(!scale){ $("gaugeHint").textContent="Not set up yet — tap Set up."; return; }
+    var w=g.clientWidth, mid=w/2, widest=chart[chart.length-1].lo+16;
+    if(widest*scale>w-30){
+      $("gaugeHint").textContent="This screen is about "+Math.round(w/scale)+" mm wide — too narrow for a life-size gauge. Turn the iPad sideways, or use the automatic reading.";
+      return;
+    }
+    $("gaugeHint").textContent="";
+    var html='<div class="gline mid" style="left:'+(mid-1)+'px"></div>',edges=[];
+    chart.forEach(function(r){ if(r.hi<900) edges.push(r.hi); });
+    edges.forEach(function(mm){
+      var h=mm/2*scale;
+      html+='<div class="gline" style="left:'+(mid-h)+'px"></div><div class="gline" style="left:'+(mid+h)+'px"></div>';
+      html+='<div class="glabel" style="left:'+(mid+h)+'px">'+mm+'</div>';
+    });
+    var prev=0;
+    chart.forEach(function(r){
+      var hi=r.hi<900?r.hi:(edges[edges.length-1]+18);
+      html+='<div class="gband" style="left:'+(mid+(prev+hi)/4*scale)+'px"><b>'+r.size+'</b><em>'+
+            (r.lo>0?r.lo:"<")+(r.hi<900?"–"+r.hi:"+")+'</em></div>';
+      prev=hi;
+    });
+    g.innerHTML+=html;
+  }
+
+  /* ---- caliper ---- */
+  var field=$("field"),jawL=$("jawL"),jawR=$("jawR"),band=$("band"),posL=0.4,posR=0.6;
+  function drawRuler(){
+    var ruler=$("ruler"); ruler.innerHTML=""; var scale=ppm(); if(!scale) return;
+    var w=ruler.clientWidth,mm=0,html="";
+    while(mm*scale<w){
+      var x=mm*scale;
+      if(mm%10===0){ html+='<span class="tick maj" style="left:'+x+'px"></span>';
+        if(mm%20===0&&x>14&&x<w-14) html+='<span class="tnum" style="left:'+x+'px">'+mm+'</span>'; }
+      else if(mm%5===0) html+='<span class="tick min" style="left:'+x+'px"></span>';
+      mm++;
+    }
+    ruler.innerHTML=html;
+  }
+  function placeJaws(){
+    var w=field.clientWidth,scale=ppm();
+    jawL.style.left=(posL*w)+"px"; jawR.style.left=(posR*w)+"px";
+    band.style.left=(Math.min(posL,posR)*w)+"px"; band.style.width=(Math.abs(posR-posL)*w)+"px";
+    var mm=scale?Math.abs(posR-posL)*w/scale:null;
+    $("mmOut").textContent=mm?mm.toFixed(0):"—";
+    $("inOut").textContent=mm?(mm/25.4).toFixed(2)+" in":"not set up";
+    $("lockBtn").disabled=!mm||mm<40||mm>180;
+  }
+  function drag(jaw,isLeft){
+    jaw.addEventListener("pointerdown",function(e){
+      jaw.setPointerCapture(e.pointerId);
+      function move(ev){
+        var r=field.getBoundingClientRect();
+        var f=Math.min(1,Math.max(0,(ev.clientX-r.left)/r.width));
+        if(isLeft) posL=f; else posR=f; placeJaws();
+      }
+      function up(){ jaw.removeEventListener("pointermove",move); jaw.removeEventListener("pointerup",up);
+                     jaw.removeEventListener("pointercancel",up); }
+      jaw.addEventListener("pointermove",move); jaw.addEventListener("pointerup",up);
+      jaw.addEventListener("pointercancel",up); e.preventDefault();
+    });
+    jaw.addEventListener("keydown",function(e){
+      var s=e.shiftKey?0.02:0.003;
+      if(e.key==="ArrowLeft"){ if(isLeft) posL=Math.max(0,posL-s); else posR=Math.max(0,posR-s); placeJaws(); e.preventDefault(); }
+      if(e.key==="ArrowRight"){ if(isLeft) posL=Math.min(1,posL+s); else posR=Math.min(1,posR+s); placeJaws(); e.preventDefault(); }
+    });
+  }
+  drag(jawL,true); drag(jawR,false);
+  function checkScreen(){
+    var box=$("measWarn"),scale=ppm();
+    if(!scale){ box.innerHTML='<p class="notice">Not set up yet — tap Set up.</p>'; return; }
+    var widthMm=field.clientWidth/scale;
+    box.innerHTML=zoomNote()+(widthMm<140?'<p class="notice">This screen is about '+Math.round(widthMm)+' mm wide — too narrow to lay a hand across.</p>':"");
+  }
+  $("lockBtn").addEventListener("click",function(){
+    showResult(Math.abs(posR-posL)*field.clientWidth/ppm(),"Measured with the bars","direct measurement");
+  });
+
+  /* ---- training ---- */
+  var pendingSpan=null;
+  var trainReader=makeReader($("trainPad"),$("trainMsg"),{
+    idle:"<b>Four fingers here</b><em>the way students will do it</em>",
+    onLock:function(span){
+      pendingSpan=span; $("trainSpan").value=span.toFixed(1);
+      $("trainAdd").disabled=!$("trainTrue").value;
+      $("trainMsg").innerHTML="<b>Captured "+span.toFixed(0)+" mm</b><em>now enter the tape measurement</em>";
+    }
+  });
+  function resetTrainPad(){ trainReader.reset(); pendingSpan=null; $("trainSpan").value=""; $("trainAdd").disabled=true; }
+  $("trainTrue").addEventListener("input",function(){ $("trainAdd").disabled=!(pendingSpan&&this.value); });
+  $("trainAdd").addEventListener("click",function(){
+    var t=parseFloat($("trainTrue").value);
+    if(!pendingSpan||isNaN(t)||t<50||t>160) return;
+    samples.push({span:Math.round(pendingSpan*10)/10,palm:t});
+    store.set("glove.samples",samples);
+    $("trainTrue").value=""; resetTrainPad(); drawTrain();
+  });
+  function drawTrain(){
+    var tb=$("trainTable").querySelector("tbody"); tb.innerHTML="";
+    var f=fit();
+    samples.forEach(function(s,i){
+      var pred=f?f.a*s.span+f.b:geoEstimate(s.span);
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td>"+(i+1)+"</td><td>"+s.span.toFixed(1)+"</td><td>"+s.palm+"</td><td>"+pred.toFixed(1)+
+        "</td><td>"+(pred-s.palm>=0?"+":"")+(pred-s.palm).toFixed(1)+
+        '</td><td><button class="ghost" data-del="'+i+'">remove</button></td>';
+      tb.appendChild(tr);
+    });
+    var st=$("trainStatus");
+    if(!f){
+      st.innerHTML='<p class="notice">'+samples.length+' of 3 samples. Until there are three, the station uses the geometric estimate.</p>';
+    } else {
+      st.innerHTML='<p class="notice good">Fitted to '+f.n+' hands: palm width = '+f.a.toFixed(3)+' × span '+
+        (f.b>=0?"+ ":"− ")+Math.abs(f.b).toFixed(1)+' mm. Average error '+f.mae.toFixed(1)+' mm.'+
+        (f.mae>6?' That is wider than half a size band — add more samples, or check how people are placing their fingers.':'')+'</p>';
+    }
+  }
+  $("trainTable").addEventListener("click",function(e){
+    var t=e.target; if(!t||!t.dataset||t.dataset.del===undefined) return;
+    samples.splice(Number(t.dataset.del),1); store.set("glove.samples",samples); drawTrain();
+  });
+  $("trainExport").addEventListener("click",function(){
+    var ta=$("trainOut"); ta.style.display="block";
+    ta.value="span_mm,true_palm_mm\n"+samples.map(function(s){return s.span+","+s.palm;}).join("\n");
+    ta.select();
+  });
+  $("trainClear").addEventListener("click",function(){
+    if(!samples.length) return;
+    samples=[]; store.set("glove.samples",samples); drawTrain();
+  });
+
+  /* ---- set up ---- */
+  function presetPpmm(p){
+    if(p.kind==="fixed") return p.ppmm;
+    var cssWide=(window.screen&&window.screen.width)?window.screen.width:window.innerWidth;
+    return cssWide/p.mm;
+  }
+  function drawPresets(){
+    var box=$("presets"); box.innerHTML="";
+    PRESETS.forEach(function(p){
+      var b=document.createElement("button");
+      b.className="preset"+(chosen===p.id?" on":"");
+      b.innerHTML="<b>"+p.name+"</b><em>"+p.note+"</em>"+
+        (detected===p.id?'<span class="det">detected</span>':"");
+      b.addEventListener("click",function(){
+        chosen=p.id; trim=1; pxPerMm=presetPpmm(p); drawPresets(); paintCheck();
+      });
+      box.appendChild(b);
+    });
+  }
+  function paintCheck(){
+    var bar=$("checkBar");
+    if(!pxPerMm){ bar.style.width="0"; $("calReadout").textContent="Pick a device to continue."; $("calWarn").innerHTML=""; return; }
+    var eff=ppm();
+    bar.style.width=(100*eff)+"px";
+    $("calReadout").textContent=eff.toFixed(3)+" pixels per mm · adjusted "+Math.round((trim-1)*100)+"%";
+    var cur=null; PRESETS.forEach(function(p){ if(p.id===chosen) cur=p; });
+    var warn=zoomNote();
+    if(cur && cur.kind==="screen"){
+      var innerCss=window.innerWidth, screenCss=(window.screen&&window.screen.width)?window.screen.width:innerCss;
+      if(innerCss<screenCss*0.95)
+        warn+='<p class="notice">This window isn\'t filling the screen, so the scale will be wrong. Go full screen and pick the device again.</p>';
+    }
+    $("calWarn").innerHTML=warn;
+  }
+  $("nudgeUp").addEventListener("click",function(){ trim*=1.01; paintCheck(); });
+  $("nudgeDown").addEventListener("click",function(){ trim/=1.01; paintCheck(); });
+  $("nudgeReset").addEventListener("click",function(){ trim=1; paintCheck(); });
+  $("calSave").addEventListener("click",function(){
+    if(!pxPerMm) return;
+    store.set("glove.pxPerMm",pxPerMm); store.set("glove.trim",trim); store.set("glove.preset",chosen);
+    show("auto");
+  });
+  var slider=$("calSlider");
+  slider.addEventListener("input",function(){
+    $("cardShape").style.width=slider.value+"px";
+    $("cardShape").style.height=(slider.value*(53.98/85.6))+"px";
+  });
+  $("cardSave").addEventListener("click",function(){
+    pxPerMm=Number(slider.value)/CARD_MM; trim=1; chosen=null;
+    store.set("glove.pxPerMm",pxPerMm); store.set("glove.trim",1); store.set("glove.preset",null);
+    show("auto");
+  });
+
+  /* ---- chart ---- */
+  function drawChart(){
+    var tb=$("chartTable").querySelector("tbody"); tb.innerHTML="";
+    chart.forEach(function(row,i){
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td><strong>"+row.size+"</strong></td>"+
+        '<td><input inputmode="decimal" data-i="'+i+'" data-k="lo" value="'+row.lo+'"></td>'+
+        '<td><input inputmode="decimal" data-i="'+i+'" data-k="hi" value="'+row.hi+'"></td>'+
+        "<td class='muted'>"+(row.lo/25.4).toFixed(2)+" – "+(row.hi>900?"+":(row.hi/25.4).toFixed(2))+"</td>";
+      tb.appendChild(tr);
+    });
+  }
+  $("chartSave").addEventListener("click",function(){
+    Array.prototype.slice.call($("chartTable").querySelectorAll("input")).forEach(function(inp){
+      var v=parseFloat(inp.value); if(!isNaN(v)) chart[Number(inp.dataset.i)][inp.dataset.k]=v;
+    });
+    store.set("glove.chart",chart); drawChart(); show("auto");
+  });
+  $("chartReset").addEventListener("click",function(){
+    chart=DEFAULTS.map(function(r){return {size:r.size,lo:r.lo,hi:r.hi};});
+    store.set("glove.chart",chart); drawChart();
+  });
+
+  /* ---- nav ---- */
+  $("navGauge").addEventListener("click",function(){ show("gauge"); });
+  $("navCal").addEventListener("click",function(){ show("cal"); });
+  $("navTrain").addEventListener("click",function(){ show("train"); });
+  $("navChart").addEventListener("click",function(){ show("chart"); });
+  $("toGauge").addEventListener("click",function(){ show("gauge"); });
+  $("toCaliper").addEventListener("click",function(){ show("measure"); });
+  $("gaugeBack").addEventListener("click",function(){ show("auto"); });
+  $("calBack").addEventListener("click",function(){ show("auto"); });
+  $("chartBack").addEventListener("click",function(){ show("auto"); });
+  $("trainBack").addEventListener("click",function(){ show("auto"); });
+  window.addEventListener("resize",function(){
+    if(current==="gauge") drawGauge();
+    if(current==="measure"){ drawRuler(); placeJaws(); checkScreen(); }
+    if(current==="cal") paintCheck();
+  });
+  document.addEventListener("gesturestart",function(e){ e.preventDefault(); });
+
+  // first run on an iPad: pre-select the detected device so set-up is one tap
+  if(!pxPerMm && detected){
+    PRESETS.forEach(function(p){ if(p.id===detected){ chosen=p.id; pxPerMm=presetPpmm(p); } });
+  }
+  show(store.get("glove.pxPerMm",null) ? "auto" : "cal");
+})();
+</script>
+</body>
+</html>
