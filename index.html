@@ -174,13 +174,17 @@
 <!-- AUTO -->
 <section class="view" id="v-auto">
   <div class="autotop">
-    <h1>Put your hand on the screen</h1>
-    <p class="muted">Rest four fingers over the grey hand. Thumb off the screen. Hold still for a second.</p>
+    <h1>Press your knuckles on the screen</h1>
+    <p class="muted">Make a loose fist and lay the four knuckles flat on the glass. Hold still for a second.</p>
   </div>
   <div class="padhost">
     <div class="pad" id="pad">
-      <svg class="silhouette" id="silhouette" viewBox="0 0 220 300" width="220" height="300" aria-hidden="true">
-        <path d="M34 300 V150 q0-16 13-18 13-2 15 14 l6 44 V58 q0-17 14-17 14 0 14 17 v96 l4-110 q1-17 15-17 14 0 14 17 l2 110 6-92 q2-16 15-14 13 2 13 18 l-2 98 q0 60-20 96 z"/>
+      <svg class="silhouette" id="silhouette" viewBox="0 0 220 240" width="220" height="240" aria-hidden="true">
+        <path d="M26 240 V86 q0-22 22-26 14-3 20 10 6-16 22-16 16 0 22 16 6-13 20-10 22 4 22 26 V240 z"/>
+        <circle cx="48" cy="92" r="13" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
+        <circle cx="84" cy="80" r="14" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
+        <circle cx="120" cy="82" r="14" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
+        <circle cx="154" cy="94" r="13" fill="none" stroke="currentColor" stroke-width="4" opacity=".5"/>
       </svg>
       <span class="banner" id="padMsg"><b>Four fingers here</b><em>side by side, flat on the glass</em></span>
       <span class="countdown" id="cdown"></span>
@@ -274,9 +278,9 @@
   <h1>Train the automatic reading</h1>
   <p>Out of the box the station works palm width out geometrically from finger spacing. Measure a handful of real hands here and it fits itself to your students instead.</p>
   <div class="cardbox">
-    <h2>1 · Capture a hand</h2>
+    <h2>1 · Capture a knuckle reading</h2>
     <div class="pad" id="trainPad" style="height:240px">
-      <span class="padmsg" id="trainMsg"><b>Four fingers here</b><em>the way students will do it</em></span>
+      <span class="padmsg" id="trainMsg"><b>Four knuckles here</b><em>the way students will do it</em></span>
     </div>
     <h2>2 · Tape-measure the same hand</h2>
     <p class="small muted">Across the knuckles, thumb excluded, hand flat.</p>
@@ -396,7 +400,7 @@
   }
 
   /* ---- fit: finger span -> palm width ---- */
-  function geoEstimate(span){ return span*4/3; }
+  function geoEstimate(span){ return span*4/3; } // 3 knuckle gaps + 1 knuckle width
   function fit(){
     if(samples.length < 3) return null;
     var n=samples.length,sx=0,sy=0,sxx=0,sxy=0;
@@ -416,7 +420,8 @@
   // Measures the path length across four fingertips in two dimensions, so a hand
   // laid on at an angle reads the same as one laid straight. Rejects contact
   // patterns that can't be four fingers side by side.
-  var GAP_MIN=9, GAP_MAX=34, SPAN_MIN=35, SPAN_MAX=115;
+  // Knuckle pitch sits near 22 mm, so the index-to-little span runs roughly 45–85 mm.
+  var GAP_MIN=13, GAP_MAX=32, SPAN_MIN=42, SPAN_MAX=95;
   function analyze(touches, rect, scale){
     var pts=[],i;
     for(i=0;i<touches.length;i++) pts.push({x:touches[i].clientX-rect.left, y:touches[i].clientY-rect.top});
@@ -443,6 +448,7 @@
   }
   function makeReader(padEl,msgEl,opts){
     var lastSpan=0,stableSince=0,locked=false,cd=opts.countdown?$(opts.countdown):null;
+    var liveCount=0,pendingRearm=false,nextIdle=null;
     function clearDots(){
       Array.prototype.slice.call(padEl.querySelectorAll(".dot,.spanline,.live-mm")).forEach(function(d){d.remove();});
     }
@@ -467,13 +473,24 @@
       }
     }
     function reset(){
-      locked=false; stableSince=0; lastSpan=0; clearDots();
+      locked=false; stableSince=0; lastSpan=0; pendingRearm=false; clearDots();
       padEl.classList.remove("live","done");
       if(cd) cd.style.width="0";
-      msgEl.innerHTML = ppm() ? opts.idle : "<b>Not set up</b><em>tap Set up at the top</em>";
+      msgEl.innerHTML = ppm() ? (nextIdle||opts.idle) : "<b>Not set up</b><em>tap Set up at the top</em>";
+      nextIdle=null;
+    }
+    // ask for another placement; waits for the hand to come off first
+    function rearm(msg){
+      nextIdle=msg||null;
+      if(liveCount===0) reset(); else pendingRearm=true;
     }
     function handle(e){
-      var scale=ppm(); if(!scale||locked||!zoomOk()) return;
+      var scale=ppm(); if(!scale||!zoomOk()) return;
+      liveCount=e.touches.length;
+      if(locked){
+        if(pendingRearm && liveCount===0){ pendingRearm=false; reset(); }
+        return;
+      }
       e.preventDefault();
       var rect=padEl.getBoundingClientRect(), n=e.touches.length;
       if(n===0){ reset(); return; }
@@ -482,10 +499,10 @@
       padEl.classList.add("live");
       if(!res.ok){
         var msg;
-        if(res.why==="count") msg="<b>"+n+" of 4 fingers</b><em>index, middle, ring and little — press each one down</em>";
-        else if(res.why==="tight") msg="<b>Fingers overlapping</b><em>ease them apart a little so each one reads separately</em>";
-        else if(res.why==="wide") msg="<b>Fingers too spread</b><em>bring them back together, side by side</em>";
-        else msg="<b>Not quite reading</b><em>lay the whole fingertip flat, not just the nail</em>";
+        if(res.why==="count") msg="<b>"+n+" of 4 knuckles</b><em>flatten the fist so all four press down together</em>";
+        else if(res.why==="tight") msg="<b>Can't separate the knuckles</b><em>press a little flatter and firmer</em>";
+        else if(res.why==="wide") msg="<b>That isn't a knuckle row</b><em>make a loose fist and lay the knuckles down</em>";
+        else msg="<b>Not quite reading</b><em>roll the fist forward so the knuckles sit flat</em>";
         msgEl.innerHTML=msg;
         stableSince=0; if(cd) cd.style.width="0"; return;
       }
@@ -506,17 +523,39 @@
     padEl.addEventListener("touchmove",handle,{passive:false});
     padEl.addEventListener("touchend",handle,{passive:false});
     padEl.addEventListener("touchcancel",function(){ reset(); });
-    return {reset:reset};
+    return {reset:reset, rearm:rearm};
   }
 
+  // One placement is never trusted on its own: the station takes two, and a third
+  // if they disagree, then reports the middle value — or admits it can't settle.
+  var readings=[];
   var autoReader = makeReader($("pad"),$("padMsg"),{
-    idle:"<b>Four fingers here</b><em>flat and together</em>",
+    idle:"<b>Four knuckles here</b><em>loose fist, flat on the glass</em>",
     countdown:"cdown",
-    onLock:function(span){
-      var est=estimate(span);
-      setTimeout(function(){ showResult(est.mm,"Read from your hand",est.how); },300);
-    }
+    onLock:function(span){ setTimeout(function(){ gotReading(span); },280); }
   });
+  function gotReading(span){
+    readings.push(span);
+    var lo=Math.min.apply(null,readings), hi=Math.max.apply(null,readings), spread=hi-lo;
+    var needAnother = readings.length<2 || (spread>5 && readings.length<3);
+    if(needAnother){
+      autoReader.rearm("<b>Reading "+readings.length+" saved</b><em>lift your hand and press again</em>");
+      return;
+    }
+    var sorted=readings.slice().sort(function(a,b){return a-b;});
+    var mid = sorted.length===2 ? (sorted[0]+sorted[1])/2 : sorted[1];
+    var finalSpread = sorted[sorted.length-1]-sorted[0];
+    var count = readings.length;
+    readings=[];
+    if(finalSpread>8){
+      autoReader.rearm("<b>Readings don't agree</b><em>they varied by "+finalSpread.toFixed(0)+" mm</em>");
+      $("autoWarn").innerHTML='<p class="notice">Three tries came out '+finalSpread.toFixed(0)+
+        ' mm apart, which is more than a whole glove size. Something about the placement isn\'t repeatable — use the life-size gauge, which measures your hand directly.</p>';
+      return;
+    }
+    var est=estimate(mid);
+    showResult(est.mm, count+" readings, agreed within "+finalSpread.toFixed(0)+" mm", est.how);
+  }
   // The silhouette is a loose placement guide drawn larger than most hands, so
   // nobody tries to match their fingers to it.
   function sizeSilhouette(){
@@ -527,7 +566,7 @@
     if(h>maxH && maxH>60){ h=maxH; w=h*220/300; }
     svg.setAttribute("width",w); svg.setAttribute("height",h);
   }
-  function resetPad(){ autoReader.reset(); setTimeout(sizeSilhouette,30); }
+  function resetPad(){ readings=[]; autoReader.reset(); setTimeout(sizeSilhouette,30); }
   function checkAuto(){
     var box=$("autoWarn");
     if(!ppm()){ box.innerHTML='<p class="notice">This screen hasn\'t been set up yet. Tap Set up at the top.</p>'; return; }
@@ -650,7 +689,7 @@
   /* ---- training ---- */
   var pendingSpan=null;
   var trainReader=makeReader($("trainPad"),$("trainMsg"),{
-    idle:"<b>Four fingers here</b><em>the way students will do it</em>",
+    idle:"<b>Four knuckles here</b><em>the way students will do it</em>",
     onLock:function(span){
       pendingSpan=span; $("trainSpan").value=span.toFixed(1);
       $("trainAdd").disabled=!$("trainTrue").value;
