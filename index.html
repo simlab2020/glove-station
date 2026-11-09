@@ -76,6 +76,23 @@
   .live-mm{position:absolute;right:16px;top:12px;font-family:Georgia,serif;font-size:36px;
     color:var(--muted);font-variant-numeric:tabular-nums;pointer-events:none}
 
+  /* full-height home so the hand comes in from the bottom edge */
+  #v-auto.on{display:flex;flex-direction:column;min-height:calc(100vh - 130px)}
+  .autotop{flex:0 0 auto}
+  .autotop h1{font-size:clamp(26px,3.4vw,40px);margin-bottom:4px}
+  .autotop p{margin-bottom:6px;font-size:17px}
+  .padhost{flex:1 1 auto;display:flex;flex-direction:column;min-height:260px}
+  .padhost .pad{flex:1 1 auto;height:auto;margin-bottom:0;border-bottom-left-radius:0;
+    border-bottom-right-radius:0;align-items:flex-end;justify-content:center}
+  .silhouette{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    pointer-events:none;opacity:.13;z-index:0}
+  .silhouette path{fill:var(--ink)}
+  .banner{position:absolute;left:0;right:0;top:0;padding:14px 16px;text-align:center;
+    pointer-events:none;z-index:3}
+  .banner b{display:block;font-size:clamp(19px,2.6vw,27px);font-weight:600}
+  .banner em{font-style:normal;color:var(--muted);font-size:16px}
+  .trouble{margin-top:10px}
+
   .verdict{background:var(--panel);border:1px solid var(--rule);border-radius:16px;padding:24px;margin:12px 0}
   .sizeletter{font-family:Georgia,"Times New Roman",serif;font-size:clamp(84px,16vw,190px);
     line-height:.8;letter-spacing:-0.03em;margin:4px 0 10px;color:var(--nitrile)}
@@ -156,13 +173,20 @@
 
 <!-- AUTO -->
 <section class="view" id="v-auto">
-  <h1>Put your hand on the screen</h1>
-  <p>Lay four fingers flat in the box — index, middle, ring, little. Keep them touching each other, thumb off the screen. Hold still and your size appears.</p>
-  <div class="pad" id="pad">
-    <span class="padmsg" id="padMsg"><b>Four fingers here</b><em>flat and together</em></span>
-    <span class="countdown" id="cdown"></span>
+  <div class="autotop">
+    <h1>Put your hand on the screen</h1>
+    <p class="muted">Rest four fingers over the grey hand. Thumb off the screen. Hold still for a second.</p>
   </div>
-  <div class="row">
+  <div class="padhost">
+    <div class="pad" id="pad">
+      <svg class="silhouette" id="silhouette" viewBox="0 0 220 300" width="220" height="300" aria-hidden="true">
+        <path d="M34 300 V150 q0-16 13-18 13-2 15 14 l6 44 V58 q0-17 14-17 14 0 14 17 v96 l4-110 q1-17 15-17 14 0 14 17 l2 110 6-92 q2-16 15-14 13 2 13 18 l-2 98 q0 60-20 96 z"/>
+      </svg>
+      <span class="banner" id="padMsg"><b>Four fingers here</b><em>side by side, flat on the glass</em></span>
+      <span class="countdown" id="cdown"></span>
+    </div>
+  </div>
+  <div class="row trouble">
     <button class="ghost" id="toGauge">Use the life-size gauge</button>
     <button class="ghost" id="toCaliper">Measure with bars</button>
   </div>
@@ -389,20 +413,33 @@
   }
 
   /* ---- touch reading ---- */
-  function spanFromTouches(touches, rect, scale){
-    var xs=[],i;
-    for(i=0;i<touches.length;i++) xs.push(touches[i].clientX-rect.left);
-    xs.sort(function(a,b){return a-b;});
-    if(xs.length<4) return null;
-    if(xs.length===4) return (xs[3]-xs[0])/scale;
-    var best=null,bestScore=Infinity;
-    for(i=0;i+3<xs.length;i++){
-      var g=[xs[i+1]-xs[i],xs[i+2]-xs[i+1],xs[i+3]-xs[i+2]];
-      var mean=(g[0]+g[1]+g[2])/3; if(mean<=0) continue;
-      var v=(Math.abs(g[0]-mean)+Math.abs(g[1]-mean)+Math.abs(g[2]-mean))/mean;
-      if(v<bestScore){ bestScore=v; best=xs[i+3]-xs[i]; }
+  // Measures the path length across four fingertips in two dimensions, so a hand
+  // laid on at an angle reads the same as one laid straight. Rejects contact
+  // patterns that can't be four fingers side by side.
+  var GAP_MIN=9, GAP_MAX=34, SPAN_MIN=35, SPAN_MAX=115;
+  function analyze(touches, rect, scale){
+    var pts=[],i;
+    for(i=0;i<touches.length;i++) pts.push({x:touches[i].clientX-rect.left, y:touches[i].clientY-rect.top});
+    if(pts.length<4) return {ok:false, why:"count", n:pts.length};
+    pts.sort(function(a,b){return a.x-b.x;});
+    function dist(a,b){ return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y))/scale; }
+    function windowAt(k){
+      var g=[dist(pts[k],pts[k+1]), dist(pts[k+1],pts[k+2]), dist(pts[k+2],pts[k+3])];
+      var span=g[0]+g[1]+g[2], mean=span/3;
+      var spread=(Math.abs(g[0]-mean)+Math.abs(g[1]-mean)+Math.abs(g[2]-mean))/(mean||1);
+      return {gaps:g, span:span, spread:spread};
     }
-    return best===null?null:best/scale;
+    var best=null;
+    for(i=0;i+3<pts.length;i++){
+      var w=windowAt(i);
+      if(best===null || w.spread<best.spread) best=w;
+    }
+    var tooTight=false, tooWide=false;
+    best.gaps.forEach(function(g){ if(g<GAP_MIN) tooTight=true; if(g>GAP_MAX) tooWide=true; });
+    if(tooTight) return {ok:false, why:"tight", span:best.span};
+    if(tooWide || best.span>SPAN_MAX) return {ok:false, why:"wide", span:best.span};
+    if(best.span<SPAN_MIN) return {ok:false, why:"small", span:best.span};
+    return {ok:true, span:best.span};
   }
   function makeReader(padEl,msgEl,opts){
     var lastSpan=0,stableSince=0,locked=false,cd=opts.countdown?$(opts.countdown):null;
@@ -440,20 +477,26 @@
       e.preventDefault();
       var rect=padEl.getBoundingClientRect(), n=e.touches.length;
       if(n===0){ reset(); return; }
-      var span=spanFromTouches(e.touches,rect,scale);
-      paint(e.touches,rect,span);
+      var res=analyze(e.touches,rect,scale);
+      paint(e.touches,rect,res.ok?res.span:null);
       padEl.classList.add("live");
-      if(span===null){
-        msgEl.innerHTML="<b>"+n+" of 4 fingers</b><em>lay them flat and together</em>";
+      if(!res.ok){
+        var msg;
+        if(res.why==="count") msg="<b>"+n+" of 4 fingers</b><em>index, middle, ring and little — press each one down</em>";
+        else if(res.why==="tight") msg="<b>Fingers overlapping</b><em>ease them apart a little so each one reads separately</em>";
+        else if(res.why==="wide") msg="<b>Fingers too spread</b><em>bring them back together, side by side</em>";
+        else msg="<b>Not quite reading</b><em>lay the whole fingertip flat, not just the nail</em>";
+        msgEl.innerHTML=msg;
         stableSince=0; if(cd) cd.style.width="0"; return;
       }
+      var span=res.span;
       var now=Date.now();
       if(Math.abs(span-lastSpan)>1.5) stableSince=now;
       lastSpan=span; if(!stableSince) stableSince=now;
       var held=now-stableSince, need=900;
       if(cd) cd.style.width=Math.min(100,held/need*100)+"%";
       msgEl.innerHTML="<b>Hold still</b><em>reading your hand</em>";
-      if(held>need && span>35 && span<130){
+      if(held>need){
         locked=true; padEl.classList.remove("live"); padEl.classList.add("done");
         if(cd) cd.style.width="100%";
         opts.onLock(span);
@@ -474,7 +517,17 @@
       setTimeout(function(){ showResult(est.mm,"Read from your hand",est.how); },300);
     }
   });
-  function resetPad(){ autoReader.reset(); }
+  // The silhouette is a loose placement guide drawn larger than most hands, so
+  // nobody tries to match their fingers to it.
+  function sizeSilhouette(){
+    var svg=$("silhouette"), scale=ppm(); if(!svg) return;
+    var pad=$("pad");
+    var wMm=118, w=scale?wMm*scale:220;
+    var h=w*300/220, maxH=pad.clientHeight-10;
+    if(h>maxH && maxH>60){ h=maxH; w=h*220/300; }
+    svg.setAttribute("width",w); svg.setAttribute("height",h);
+  }
+  function resetPad(){ autoReader.reset(); setTimeout(sizeSilhouette,30); }
   function checkAuto(){
     var box=$("autoWarn");
     if(!ppm()){ box.innerHTML='<p class="notice">This screen hasn\'t been set up yet. Tap Set up at the top.</p>'; return; }
@@ -738,6 +791,7 @@
     if(current==="gauge") drawGauge();
     if(current==="measure"){ drawRuler(); placeJaws(); checkScreen(); }
     if(current==="cal") paintCheck();
+    if(current==="auto") sizeSilhouette();
   });
   document.addEventListener("gesturestart",function(e){ e.preventDefault(); });
 
